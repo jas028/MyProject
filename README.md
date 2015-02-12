@@ -1,3 +1,3 @@
 # MyProject
 # TEST
-# I don't get it
+# I get it
