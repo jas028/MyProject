@@ -4,7 +4,29 @@ A simple desktop app for personal finance management.
 
 ## Build
 
-The initial build has yet to be updated.
+The current build implements the basic MVC architecture of the main module.
+
+Use following invocation to build and run the project:
+
+```
+javac BudgetApp.java
+java BudgetApp
+```
+
+## TODO
+
+1. System Architecture
+
+  * ~~Basic MVC architecture implementation~~
+
+2. UI
+
+  * Basic design and implementation
+
+3. Data Storage
+
+  * File system storage and implementation
+
 
 ## Credits
 
