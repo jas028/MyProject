@@ -38,7 +38,7 @@ public class NavigationLayoutController {
 		expenseColumn.setCellValueFactory(cellData -> cellData.getValue().getExpenseProperty());
 		
 		// Custom rendering of the date column table cell.
-		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("hh:mm MM/dd/yyyy");
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd MMM");
 		dateColumn.setCellFactory(column -> {
 		    return new TableCell<Transaction, LocalDateTime>() {
 		        @Override
@@ -74,6 +74,20 @@ public class NavigationLayoutController {
 				}
 			};
 		});
+	}
+	
+	/**
+	 * Called when the user deletes a transaction.
+	 */
+	@FXML
+	public void handleDeleteTransaction() {
+		int selectedIndex = transactionTable.getSelectionModel().getSelectedIndex();
+		if(selectedIndex >= 0) {
+			transactionTable.getItems().remove(selectedIndex);
+		}
+		else {
+			// TODO: Alert dialog box.
+		}
 	}
 	
 	/**

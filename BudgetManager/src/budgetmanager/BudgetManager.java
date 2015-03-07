@@ -29,16 +29,16 @@ public class BudgetManager extends Application {
 
 	public BudgetManager() {
 		// Sample transaction data.
-		transactionData.add(new Transaction(1.00, (LocalDateTime.now()), "transaction 1"));
-		transactionData.add(new Transaction(2.00, (LocalDateTime.now()), "transaction 2"));
-		transactionData.add(new Transaction(500.00, (LocalDateTime.now()), "transaction 3"));
-		transactionData.add(new Transaction(1000.10, (LocalDateTime.now()), "transaction 4"));
-		transactionData.add(new Transaction(-12.00, (LocalDateTime.now()), "transaction 5 testing width of transaction description in table view"));
-		transactionData.add(new Transaction(12.99, (LocalDateTime.now()), "transaction 6"));
-		transactionData.add(new Transaction(3.25, (LocalDateTime.now()), "transaction 7"));
-		transactionData.add(new Transaction(23.65, (LocalDateTime.now()), "transaction 8"));
-		transactionData.add(new Transaction(234.97, (LocalDateTime.now()), "transaction 9"));
-		transactionData.add(new Transaction(34.40, (LocalDateTime.now()), "transaction 10"));
+		transactionData.add(new Transaction(1.00, (LocalDateTime.now()), "transaction 1", true));
+		transactionData.add(new Transaction(2.00, (LocalDateTime.now()), "transaction 2", false));
+		transactionData.add(new Transaction(500.00, (LocalDateTime.now()), "transaction 3", false));
+		transactionData.add(new Transaction(1000.10, (LocalDateTime.now()), "transaction 4", false));
+		transactionData.add(new Transaction(-12.00, (LocalDateTime.now()), "transaction 5 testing width of transaction description in table view", false));
+		transactionData.add(new Transaction(12.99, (LocalDateTime.now()), "transaction 6", false));
+		transactionData.add(new Transaction(3.25, (LocalDateTime.now()), "transaction 7", false));
+		transactionData.add(new Transaction(23.65, (LocalDateTime.now()), "transaction 8", false));
+		transactionData.add(new Transaction(234.97, (LocalDateTime.now()), "transaction 9", false));
+		transactionData.add(new Transaction(34.40, (LocalDateTime.now()), "transaction 10", false));
 	}
 	
 	@Override
@@ -89,6 +89,10 @@ public class BudgetManager extends Application {
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void addTransaction(Transaction transaction) {
+		transactionData.add(transaction);
 	}
 	
 	/**

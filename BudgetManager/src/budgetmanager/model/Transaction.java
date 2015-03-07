@@ -2,8 +2,10 @@ package budgetmanager.model;
 
 import java.time.LocalDateTime;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -17,9 +19,10 @@ public class Transaction {
 	private final DoubleProperty expense;
 	private final ObjectProperty<LocalDateTime> date;
 	private final StringProperty description;
+	private final BooleanProperty reoccuring;
 	
 	public Transaction() {
-		this(0.00, null, null);
+		this(0.00, null, null, false);
 	}
 	
 	/**
@@ -29,10 +32,11 @@ public class Transaction {
 	 * @param expense
 	 * @param description
 	 */
-	public Transaction(Double expense, LocalDateTime date, String description) {
+	public Transaction(Double expense, LocalDateTime date, String description, boolean reoccuring) {
 		this.expense = new SimpleDoubleProperty(expense);
 		this.date = new SimpleObjectProperty<LocalDateTime>(date);
 		this.description = new SimpleStringProperty(description);
+		this.reoccuring = new SimpleBooleanProperty(reoccuring);
 	}
 	
 	public Double getExpense() {
@@ -69,5 +73,17 @@ public class Transaction {
 	
 	public StringProperty getDescriptionProperty() {
 		return description;
+	}
+	
+	public boolean getReoccuring() {
+		return reoccuring.get();
+	}
+	
+	public void setReoccuring(boolean reoccuring) {
+		this.reoccuring.set(reoccuring);
+	}
+	
+	public BooleanProperty getReoccuringProperty() {
+		return reoccuring;
 	}
 }
