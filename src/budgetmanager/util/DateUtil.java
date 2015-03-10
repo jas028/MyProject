@@ -1,6 +1,6 @@
 package budgetmanager.util;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -10,7 +10,7 @@ import java.time.format.DateTimeParseException;
 public class DateUtil {
 
 	/** Date pattern that is used for conversion. */
-	private static final String DATE_TIME_PATTERN = "hh:mm MM/dd/yyyy";
+	private static final String DATE_TIME_PATTERN = "MM/dd/yyyy";
 	
 	/** Date formatter */
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
@@ -21,7 +21,7 @@ public class DateUtil {
 	 * @param date to be returned as string
 	 * @return Formatted String
 	 */
-	public static String format(LocalDateTime date) {
+	public static String format(LocalDate date) {
 		if(date == null) {
 			return null;
 		}
@@ -29,15 +29,15 @@ public class DateUtil {
 	}
 	
 	/**
-	 * Converts a String in the format of {@link DateUtil#DATE_TIME_PATTERN} to a {@link LocalDateTime} object.
+	 * Converts a String in the format of {@link DateUtil#DATE_TIME_PATTERN} to a {@link LocalDate} object.
 	 * Returns null if the string could not be converted.
 	 * 
 	 * @param dateString the date as a String
 	 * @return The date object or null if it could not be converted
 	 */
-	public static LocalDateTime parse(String dateString) {
+	public static LocalDate parse(String dateString) {
 		try {
-			return DATE_FORMATTER.parse(dateString, LocalDateTime::from);
+			return DATE_FORMATTER.parse(dateString, LocalDate::from);
 		} catch(DateTimeParseException e) {
 			return null;
 		}

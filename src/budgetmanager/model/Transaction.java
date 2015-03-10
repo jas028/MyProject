@@ -1,6 +1,6 @@
 package budgetmanager.model;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -17,7 +17,7 @@ import javafx.beans.property.StringProperty;
 public class Transaction {
 
 	private final DoubleProperty expense;
-	private final ObjectProperty<LocalDateTime> date;
+	private final ObjectProperty<LocalDate> date;
 	private final StringProperty description;
 	private final BooleanProperty reoccuring;
 	
@@ -32,9 +32,9 @@ public class Transaction {
 	 * @param expense
 	 * @param description
 	 */
-	public Transaction(Double expense, LocalDateTime date, String description, boolean reoccuring) {
+	public Transaction(Double expense, LocalDate date, String description, boolean reoccuring) {
 		this.expense = new SimpleDoubleProperty(expense);
-		this.date = new SimpleObjectProperty<LocalDateTime>(date);
+		this.date = new SimpleObjectProperty<LocalDate>(date);
 		this.description = new SimpleStringProperty(description);
 		this.reoccuring = new SimpleBooleanProperty(reoccuring);
 	}
@@ -51,15 +51,15 @@ public class Transaction {
 		return expense;
 	}
 	
-	public LocalDateTime getDate() {
+	public LocalDate getDate() {
 		return date.get();
 	}
 	
-	public void setDate(LocalDateTime date) {
+	public void setDate(LocalDate date) {
 		this.date.set(date);
 	}
 	
-	public ObjectProperty<LocalDateTime> getDateProperty() {
+	public ObjectProperty<LocalDate> getDateProperty() {
 		return date;
 	}
 	

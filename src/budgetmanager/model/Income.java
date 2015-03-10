@@ -1,6 +1,6 @@
 package budgetmanager.model;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -17,7 +17,7 @@ public class Income extends Transaction {
 		this(0.0, null, null, false, null);
 	}
 	
-	public Income(Double expense, LocalDateTime date, String description, boolean reoccuring, IncomeCategory category) {
+	public Income(Double expense, LocalDate date, String description, boolean reoccuring, IncomeCategory category) {
 		super(expense, date, description, reoccuring);
 		this.category = new SimpleObjectProperty<IncomeCategory>(category);
 	}

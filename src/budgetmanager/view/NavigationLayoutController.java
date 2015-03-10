@@ -3,7 +3,7 @@ package budgetmanager.view;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import budgetmanager.BudgetManager;
@@ -26,7 +26,7 @@ public class NavigationLayoutController {
 	@FXML
 	private TableColumn<Transaction, Number> expenseColumn;
 	@FXML
-	private TableColumn<Transaction, LocalDateTime> dateColumn;
+	private TableColumn<Transaction, LocalDate> dateColumn;
 	@FXML
 	private TableColumn<Transaction, String> descriptionColumn;
 	
@@ -82,9 +82,9 @@ public class NavigationLayoutController {
 		// Custom rendering of the date column table cell.
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd MMM");
 		dateColumn.setCellFactory(column -> {
-		    return new TableCell<Transaction, LocalDateTime>() {
+		    return new TableCell<Transaction, LocalDate>() {
 		        @Override
-		        protected void updateItem(LocalDateTime item, boolean empty) {
+		        protected void updateItem(LocalDate item, boolean empty) {
 		            super.updateItem(item, empty);
 
 		            if (item == null || empty) {
@@ -193,7 +193,7 @@ public class NavigationLayoutController {
 
 		//System.out.print(loanName + " " + balance + " " + rate + " " + payment);
 		
-		//transactionData.add(new Transaction(1.00, (LocalDateTime.now()), "transaction 1"));
+		//transactionData.add(new Transaction(1.00, (LocalDate.now()), "transaction 1"));
 
 	}
 }
