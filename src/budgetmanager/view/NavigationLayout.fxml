@@ -6,14 +6,14 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="budgetmanager.view.NavigationLayoutController">
+<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="budgetmanager.view.NavigationLayoutController">
   <!-- TODO Add Nodes -->
   <children>
-    <TabPane prefHeight="300.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <TabPane tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <tabs>
         <Tab text="Transactions">
           <content>
-            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+            <AnchorPane id="Content" prefHeight="180.0" prefWidth="200.0">
               <children>
                 <TableView fx:id="transactionTable" prefHeight="300.0" prefWidth="600.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                   <columnResizePolicy>
@@ -41,7 +41,7 @@
         </Tab>
             <Tab text="Savings Calculator">
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="319.0" prefWidth="600.0">
+                <AnchorPane>
                      <children>
                         <GridPane layoutX="116.0" layoutY="58.0" prefHeight="107.0" prefWidth="368.0">
                           <columnConstraints>
@@ -71,7 +71,7 @@
             </Tab>
             <Tab text="Debt Payoff Calculator">
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="301.0" prefWidth="634.0">
+                <AnchorPane minHeight="0.0" minWidth="0.0">
                      <children>
                         <GridPane layoutX="21.0" layoutY="18.0" prefHeight="78.0" prefWidth="545.0">
                           <columnConstraints>
@@ -94,7 +94,7 @@
                               <TextField fx:id="debtCalBalance" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                               <TextField fx:id="debtCalPayment" GridPane.columnIndex="3" />
                               <TextField fx:id="debtCalRate" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                              <Button fx:id="debtCalAddButton" mnemonicParsing="false" onAction="#debtPayoffCalc" text="Add Debt" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Button fx:id="debtCalAddButton" mnemonicParsing="false" text="Add Debt" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                               <Button fx:id="debtCalPayoffButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="118.0" text="Calculate Payoff" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                            </children>
                         </GridPane>
@@ -110,11 +110,6 @@
                   </AnchorPane>
               </content>
             </Tab>
-        <Tab text="Graphs">
-          <content>
-            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-          </content>
-        </Tab>
       </tabs>
     </TabPane>
   </children>
