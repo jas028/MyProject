@@ -3,7 +3,8 @@ package budgetmanager;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-import budgetmanager.model.Transaction;
+import budgetmanager.model.*;
+import budgetmanager.util.*;
 import budgetmanager.view.NavigationLayoutController;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -91,8 +92,18 @@ public class BudgetManager extends Application {
 		}
 	}
 	
-	public void addTransaction(Transaction transaction) {
-		transactionData.add(transaction);
+	/**
+	 * Creates a new Expense object and adds it to the transaction list.  Does no data validation.
+	 */
+	public void addTransaction(Double value, LocalDateTime date, String description, boolean reoccuring, ExpenseCategory category) {
+		transactionData.add(new Expense(value, null, "", false, null));
+	}
+	
+	/**
+	 * Creates a new Income object and adds it to the transaction list.  Does no data validation.
+	 */
+	public void addTransaction(Double value, LocalDateTime date, String description, boolean reoccuring, IncomeCategory category) {
+		transactionData.add(new Income(value, date, description, reoccuring, category));
 	}
 	
 	/**

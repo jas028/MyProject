@@ -1,6 +1,6 @@
 package budgetmanager.util;
 
-public enum Category {
+public enum ExpenseCategory {
 	GENERAL,
 	HOUSING,
 	INSURANCE,
