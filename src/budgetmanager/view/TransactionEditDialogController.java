@@ -1,9 +1,7 @@
 package budgetmanager.view;
 
 import java.io.IOException;
-import java.math.RoundingMode;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.util.ResourceBundle;
 
 import budgetmanager.BudgetManager;

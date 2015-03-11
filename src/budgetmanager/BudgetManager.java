@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 
 import budgetmanager.model.*;
-import budgetmanager.util.*;
 import budgetmanager.view.NavigationLayoutController;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -27,19 +26,21 @@ public class BudgetManager extends Application {
 	private NavigationLayoutController navigationLayoutController;
 	
 	private ObservableList<Transaction> transactionData = FXCollections.observableArrayList();
+	
+	private ObservableList<Debt> debtData = FXCollections.observableArrayList();
 
 	public BudgetManager() {
 		// Sample transaction data.
-		transactionData.add(new Expense(-1.00, (LocalDate.now()), "transaction 1", true, null));
-		transactionData.add(new Expense(-2.00, (LocalDate.now()), "transaction 2", false, null));
-		transactionData.add(new Expense(-500.00, (LocalDate.now()), "transaction 3", true, null));
-		transactionData.add(new Expense(-1000.10, (LocalDate.now()), "transaction 4", false, null));
-		transactionData.add(new Expense(-12.00, (LocalDate.now()), "transaction 5 testing width of transaction description in table view", false, null));
-		transactionData.add(new Income(12.99, (LocalDate.now()), "transaction 6", false, null));
-		transactionData.add(new Income(3.25, (LocalDate.now()), "transaction 7", true, null));
-		transactionData.add(new Income(23.65, (LocalDate.now()), "transaction 8", true, null));
-		transactionData.add(new Income(234.97, (LocalDate.now()), "transaction 9", false, null));
-		transactionData.add(new Income(34.40, (LocalDate.now()), "transaction 10", true, null));
+		transactionData.add(new Expense(-7.50, (LocalDate.now()), "George's Grill", false, null));
+		transactionData.add(new Expense(-5.00, (LocalDate.now()), "Parking", false, null));
+		transactionData.add(new Expense(-650.00, (LocalDate.of(2015, 3, 8)), "Rent", true, null));
+		transactionData.add(new Income(1264.43, (LocalDate.of(2015, 3, 5)), "Tax Return", false, null));
+		transactionData.add(new Income(367.48, (LocalDate.of(2015, 3, 1)), "Paycheck", true, null));
+		transactionData.add(new Expense(-98.10, (LocalDate.of(2015, 2, 20)), "Electricity", false, null));
+		
+		// Sample debt data
+		debtData.add(new Debt("Car Payment", 1.5, 2000.00, 98.00));
+		debtData.add(new Debt("Student Loan", 1.25, 32000.00, 350.00));
 	}
 	
 	@Override
@@ -120,6 +121,18 @@ public class BudgetManager extends Application {
 	 */
 	public ObservableList<Transaction> getTransactionData() {
 		return transactionData;
+	}
+	
+	public void addDebt(Debt debt) {
+		debtData.add(debt);
+	}
+	
+	/**
+	 * Returns the data as an observable list of Debts.
+	 * @param 
+	 */
+	public ObservableList<Debt> getDebtData() {
+		return debtData;
 	}
 
 	public static void main(String[] args) {

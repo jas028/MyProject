@@ -42,11 +42,7 @@ public class NavigationLayoutController {
 	@FXML
 	private TextField debtCalRate;
 	@FXML
-	private Button debtCalAddButton;
-	@FXML
-	private Button debtCalPayoffButton;
-	@FXML
-	private TableView<Debt> debtCalTableView;
+	private TableView<Debt> debtCalTable;
 	@FXML
 	private TableColumn<Debt, String> debtColName;
 	@FXML
@@ -110,6 +106,67 @@ public class NavigationLayoutController {
 						else {
 							setTextFill(Color.GREEN);
 						}
+					}
+				}
+			};
+		});
+		
+		// Initialize the debt table with data.
+		debtColName.setCellValueFactory(cellData -> cellData.getValue().getNameProperty());
+		debtColBalance.setCellValueFactory(cellData -> cellData.getValue().getBalanceProperty());
+		debtColPayment.setCellValueFactory(cellData -> cellData.getValue().getPaymentProperty());
+		debtColRate.setCellValueFactory(cellData -> cellData.getValue().getRateProperty());
+		
+		// Custom rendering of the expense column table cell.
+		debtColBalance.setCellFactory(column -> {
+			return new TableCell<Debt, Number>() {
+				@Override
+				protected void updateItem(Number item, boolean empty) {
+					super.updateItem(item, empty);
+
+					if (item == null || empty) {
+						setText(null);
+						setStyle("");
+					} else {
+						// Format value.
+						setText(numberFormatter.format(item));
+					}
+				}
+			};
+		});
+
+		// Custom rendering of the expense column table cell.
+		debtColPayment.setCellFactory(column -> {
+			return new TableCell<Debt, Number>() {
+				@Override
+				protected void updateItem(Number item, boolean empty) {
+					super.updateItem(item, empty);
+
+					if (item == null || empty) {
+						setText(null);
+						setStyle("");
+					} else {
+						// Format value.
+						setText(numberFormatter.format(item));
+					}
+				}
+			};
+		});
+
+		// Custom rendering of the expense column table cell.
+		NumberFormat rateFormatter = new DecimalFormat("###,##0.000");
+		debtColRate.setCellFactory(column -> {
+			return new TableCell<Debt, Number>() {
+				@Override
+				protected void updateItem(Number item, boolean empty) {
+					super.updateItem(item, empty);
+
+					if (item == null || empty) {
+						setText(null);
+						setStyle("");
+					} else {
+						// Format value.
+						setText(rateFormatter.format(item)+"%");
 					}
 				}
 			};
@@ -179,8 +236,9 @@ public class NavigationLayoutController {
 	public void setMainApp(BudgetManager budgetManager) {
 		this.budgetManager = budgetManager;
 		
-		// Add observable list data to the table.
+		// Add observable list data to the tables.
 		transactionTable.setItems(budgetManager.getTransactionData());
+		debtCalTable.setItems(budgetManager.getDebtData());
 	}
 	
 	/**
@@ -239,22 +297,87 @@ public class NavigationLayoutController {
 	}
 	
 	@FXML
-	public void debtPayoffCalc(){
-		String loanName = debtCalName.getText();
-		double balance = 0;
-		double rate = 0;
-		double payment = 0;
+	public void handleAddDebt() {
+		Double debtBalance, debtPayment, debtRate;
 		
-		balance = Double.parseDouble(debtCalBalance.getText());
-		rate = Double.parseDouble(debtCalRate.getText());
-		payment = Double.parseDouble(debtCalPayment.getText());
+		try {
+			debtBalance = Double.parseDouble(debtCalBalance.getText());
+			if(debtBalance <= 0) {
+				throw new NumberFormatException();
+			}
+		} catch(NumberFormatException e) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Debt Tracker Error");
+			alert.setContentText("Debt balances must be nonnegative monetary values");
+			
+			alert.showAndWait();
+			return;
+		}
 		
-		//ObservableList<Debt> debtData = FXCollections.observableArrayList();
-		//debtData.add(new Debt(loanName, balance, rate, payment));
-
-		//System.out.print(loanName + " " + balance + " " + rate + " " + payment);
+		try {
+			debtPayment = Double.parseDouble(debtCalPayment.getText());
+			if(debtPayment <= 0) {
+				throw new NumberFormatException();
+			}
+		} catch(NumberFormatException e) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Debt Tracker Error");
+			alert.setContentText("Debt payments must be nonnegative monetary values");
+			
+			alert.showAndWait();
+			return;
+		}
 		
-		//transactionData.add(new Transaction(1.00, (LocalDate.now()), "transaction 1"));
-
+		try {
+			debtRate = Double.parseDouble(debtCalRate.getText());
+			if(debtRate <= 0) {
+				throw new NumberFormatException();
+			}
+		} catch(NumberFormatException e) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Debt Tracker Error");
+			alert.setContentText("Debt rates must be nonnegative values");
+			
+			alert.showAndWait();
+			return;
+		}
+		
+		budgetManager.addDebt(new Debt(debtCalName.getText(), debtRate, debtBalance, debtPayment));
+		debtCalName.clear();
+		debtCalRate.clear();
+		debtCalBalance.clear();
+		debtCalPayment.clear();
+	}
+	
+	@FXML
+	public void handleDeleteDebt() {
+		int selectedIndex = debtCalTable.getSelectionModel().getSelectedIndex();
+		if(selectedIndex >= 0) {
+			debtCalTable.getItems().remove(selectedIndex);
+		}
+		else {
+			// Nothing selected
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Debt Delete Error");
+			alert.setContentText("You must select a debt to delete");
+			
+			alert.showAndWait();
+		}
+	}
+	
+	@FXML
+	public void handleDebtPayoffCalc() {
+		// TODO: Debt calculations?
+		
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("Information");
+		alert.setHeaderText("Debt Payoff Calculation");
+		alert.setContentText("This feature coming is coming soon");
+		
+		alert.showAndWait();
 	}
 }

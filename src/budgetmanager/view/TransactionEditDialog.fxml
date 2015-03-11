@@ -30,7 +30,7 @@
                </children>
             </HBox>
             <Label text="Type" />
-            <Label text="Value" GridPane.rowIndex="1" />
+            <Label text="Value (USD)" GridPane.rowIndex="1" />
             <Label text="Description" GridPane.rowIndex="2" />
             <TextField fx:id="valueField" promptText="0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <TextField fx:id="descriptionField" promptText="Transaction Information" GridPane.columnIndex="1" GridPane.rowIndex="2" />

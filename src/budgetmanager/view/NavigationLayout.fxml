@@ -39,6 +39,52 @@
             </AnchorPane>
           </content>
         </Tab>
+            <Tab text="Debt Tracker">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0">
+                     <children>
+                        <GridPane layoutX="21.0" layoutY="18.0" prefHeight="78.0" prefWidth="545.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+                          <columnConstraints>
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="0.0" prefWidth="10.0" />
+                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints maxHeight="22.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="Loan Name:" GridPane.halignment="LEFT" />
+                              <Label text="Current Balance:" GridPane.halignment="LEFT" GridPane.rowIndex="1" />
+                              <Label text="  Minimum Payment:" GridPane.columnIndex="3" GridPane.halignment="LEFT" />
+                              <Label text="  Interest Rate:" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.rowIndex="1" />
+                              <TextField fx:id="debtCalName" prefHeight="26.0" prefWidth="120.0" promptText="Debt Information" GridPane.columnIndex="1" />
+                              <TextField fx:id="debtCalBalance" promptText="0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <TextField fx:id="debtCalPayment" promptText="0.00" GridPane.columnIndex="4" />
+                              <TextField fx:id="debtCalRate" promptText="0.00" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                              <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleAddDebt" prefWidth="100.0" text="Add" GridPane.rowIndex="2" />
+                              <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleDebtPayoffCalc" prefWidth="125.0" text="Calculate Payoff" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                              <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleDeleteDebt" prefWidth="100.0" text="Delete" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                           </children>
+                        </GridPane>
+                        <TableView fx:id="debtCalTable" layoutX="4.0" layoutY="104.0" prefHeight="156.0" prefWidth="587.0" AnchorPane.bottomAnchor="110.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                         	<columnResizePolicy>
+                    			<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                  			</columnResizePolicy>
+                          <columns>
+                            <TableColumn fx:id="debtColName" prefWidth="210.0" text="Loan Name" />
+                            <TableColumn fx:id="debtColBalance" prefWidth="126.0" text="Current Balance" />
+                              <TableColumn fx:id="debtColPayment" prefWidth="139.0" text="Minimum Payment" />
+                              <TableColumn fx:id="debtColRate" prefWidth="111.0" text="Interest Rate" />
+                          </columns>
+                        </TableView>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
             <Tab text="Savings Calculator">
               <content>
                 <AnchorPane>
@@ -72,47 +118,6 @@
                               </HBox>
                            </children>
                         </GridPane>
-                     </children>
-                  </AnchorPane>
-              </content>
-            </Tab>
-            <Tab text="Debt Payoff Calculator">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0">
-                     <children>
-                        <GridPane layoutX="21.0" layoutY="18.0" prefHeight="78.0" prefWidth="545.0">
-                          <columnConstraints>
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints maxHeight="22.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
-                            <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <Label text="Loan Name" />
-                              <Label text="Current Balance" GridPane.rowIndex="1" />
-                              <Label text="  Minimum Payment" GridPane.columnIndex="2" />
-                              <Label text="  Interest Rate" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                              <TextField fx:id="debtCalName" prefHeight="26.0" prefWidth="120.0" GridPane.columnIndex="1" />
-                              <TextField fx:id="debtCalBalance" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <TextField fx:id="debtCalPayment" GridPane.columnIndex="3" />
-                              <TextField fx:id="debtCalRate" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                              <Button fx:id="debtCalAddButton" mnemonicParsing="false" text="Add Debt" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                              <Button fx:id="debtCalPayoffButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="118.0" text="Calculate Payoff" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                           </children>
-                        </GridPane>
-                        <TableView fx:id="debtCalTableView" layoutX="4.0" layoutY="104.0" prefHeight="156.0" prefWidth="587.0">
-                          <columns>
-                            <TableColumn fx:id="debtColName" prefWidth="210.0" text="Loan Name" />
-                            <TableColumn fx:id="debtColBalance" prefWidth="126.0" text="Current Balance" />
-                              <TableColumn fx:id="debtColPayment" prefWidth="139.0" text="Minimum Payment" />
-                              <TableColumn fx:id="debtColRate" prefWidth="111.0" text="Interest Rate" />
-                          </columns>
-                        </TableView>
                      </children>
                   </AnchorPane>
               </content>
