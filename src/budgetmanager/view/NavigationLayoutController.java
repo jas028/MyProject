@@ -26,15 +26,11 @@ public class NavigationLayoutController {
 	
 	//--- Savings Calculator Variables
 	@FXML
-	private TextField savingsCalDescription;
-	@FXML
 	private TextField savingsCalGoal;
 	@FXML
 	private TextField savingsCalAllotment;
 	@FXML
-	private Label savingsCalResult;
-	@FXML
-	private Button savingsCalButton;
+	private Label calcResultLabel;
 
 	//--- Debt Payoff Calculator Variables
 	@FXML
@@ -147,7 +143,7 @@ public class NavigationLayoutController {
 		else {
 			// Nothing selected
 			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Selection Error");
+			alert.setTitle("Error");
 			alert.setHeaderText("Transaction Edit Error");
 			alert.setContentText("You must select a transaction to edit");
 			
@@ -167,7 +163,7 @@ public class NavigationLayoutController {
 		else {
 			// Nothing selected
 			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Selection Error");
+			alert.setTitle("Error");
 			alert.setHeaderText("Transaction Delete Error");
 			alert.setContentText("You must select a transaction to delete");
 			
@@ -192,26 +188,53 @@ public class NavigationLayoutController {
 	 */
 	@FXML
 	public void handleCalcSavingsGoal() {
-		String result;
-		
+		calcResultLabel.setText(null);
 	    try {
-	    	String description = savingsCalDescription.getText();
 			double total = Double.parseDouble(savingsCalGoal.getText());
 			double allotment = Double.parseDouble(savingsCalAllotment.getText());	
 
 			if(allotment > 0.00 && total > 0.00) {
 				Double temp = new Double(Math.ceil(total / allotment));
 			    int numMonths = temp.intValue();
-			    result = "It will take you " + numMonths + " months to meet your savings goal of $" + total + ".";
-			    savingsCalResult.setText(result);
+			    NumberFormat numberFormatter = new DecimalFormat("$###,###.00");
+			    calcResultLabel.setText("It will take you " + numMonths + " months to meet your savings goal of " + numberFormatter.format(total));
 			}
 			else {
-				result = "Invalid value";
+				throw new NumberFormatException();
 			}
-			savingsCalResult.setText(result);
-		} catch (NumberFormatException e) {
-			result = "You must complete the required fields";
-			savingsCalResult.setText(result);
+		} catch(NumberFormatException e) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Savings Calculation Error");
+			alert.setContentText("You must provide valid numeric values");
+			
+			alert.showAndWait();
+		} catch(NullPointerException e) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Savings Calculation Error");
+			alert.setContentText("You must complete all fields");
+			
+			alert.showAndWait();
+		}
+	}
+	
+	@FXML
+	public void handleAddSavingsTransaction() {
+		try {
+			TransactionEditDialogController dialog = new TransactionEditDialogController();
+			dialog.setMainApp(budgetManager);
+			dialog.setSavingsCalcInfo(Double.parseDouble(savingsCalAllotment.getText()), true);
+			dialog.disableTypeChoice();
+			dialog.showAndWait();
+			dialog.enableTypeChoice();
+		} catch (NullPointerException e) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Savings Calculation Error");
+			alert.setContentText("You must complete all fields");
+			
+			alert.showAndWait();
 		}
 	}
 	

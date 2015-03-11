@@ -105,21 +105,21 @@ public class TransactionEditDialogController extends Stage implements Initializa
 			close();
 		} catch(NumberFormatException e) {
 			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Input Error");
+			alert.setTitle("Error");
 			alert.setHeaderText("Transaction Add/Edit Error");
 			alert.setContentText("Please enter a numeric monetary value");
 			
 			alert.showAndWait();
 		} catch(NullPointerException e) {
 			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Input Error");
+			alert.setTitle("Error");
 			alert.setHeaderText("Transaction Add/Edit Error");
 			alert.setContentText("You must complete all forms");
 			
 			alert.showAndWait();
 		} catch(ClassCastException e) {
 			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Input Error");
+			alert.setTitle("Error");
 			alert.setHeaderText("Transaction Edit Error");
 			alert.setContentText("Cannot change transaction types");
 			
@@ -167,6 +167,14 @@ public class TransactionEditDialogController extends Stage implements Initializa
 
 	public void enableTypeChoice() {
 		typeChoice.setDisable(false);
+	}
+	
+	public void setSavingsCalcInfo(Double value, boolean reoccuring) {
+		typeChoice.getSelectionModel().selectFirst();
+		
+		valueField.setText(Double.toString(value));
+		
+		reoccuringCheckBox.setSelected(reoccuring);
 	}
 
 	@Override

@@ -4,7 +4,6 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <GridPane vgap="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
@@ -33,8 +32,8 @@
             <Label text="Type" />
             <Label text="Value" GridPane.rowIndex="1" />
             <Label text="Description" GridPane.rowIndex="2" />
-            <TextField fx:id="valueField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField fx:id="descriptionField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="valueField" promptText="0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="descriptionField" promptText="Transaction Information" GridPane.columnIndex="1" GridPane.rowIndex="2" />
          </children>
       </GridPane>
    </children>

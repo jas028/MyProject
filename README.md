@@ -4,7 +4,7 @@ A simple desktop app for personal finance management.
 
 ## Build
 
-The current build requires JavaFX for staging GUI elements.  Scenes are built using JavaFX Scenebuilder.  
+The current build requires JavaRE v1.8.0_40.  For development, JavaSDK v1.8.0_40 and JavaFX are required.  Scenes are built using JavaFX Scenebuilder.  
 
 #### JavaFX Install Instructions
 1. In Eclipse, navigate to Help > Install New Software
@@ -23,15 +23,15 @@ Detailed configuration and JavaFX tutorial found [here](http://code.makery.ch/ja
 ## TODO
 
 1. GUI
-  * ~~Basic JavaFX staging~~
-  * Transaction list view
-    * ~~Transaction model~~
-    * ~~Display stored data in list~~ 
-    * Modifiable data entries from GUI
-    * Fine-tune display settings
-  * Budget view
+* ~~Basic JavaFX staging~~
+* Transaction list view
+* ~~Transaction model~~
+* ~~Display stored data in list~~ 
+* Modifiable data entries from GUI
+* Fine-tune display settings
+* Budget view
 3. Data Storage
-  * File system storage and implementation
+* File system storage and implementation
 
 
 ## Credits
