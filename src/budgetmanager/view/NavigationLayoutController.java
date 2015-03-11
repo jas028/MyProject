@@ -1,6 +1,5 @@
 package budgetmanager.view;
 
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -10,14 +9,9 @@ import budgetmanager.BudgetManager;
 import budgetmanager.model.Debt;
 import budgetmanager.model.Transaction;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.paint.Color;
 
 public class NavigationLayoutController {
 	
@@ -77,7 +71,7 @@ public class NavigationLayoutController {
 		// Initialize the transaction table with the data.
 		dateColumn.setCellValueFactory(cellData -> cellData.getValue().getDateProperty());
 		descriptionColumn.setCellValueFactory(cellData -> cellData.getValue().getDescriptionProperty());
-		expenseColumn.setCellValueFactory(cellData -> cellData.getValue().getExpenseProperty());
+		expenseColumn.setCellValueFactory(cellData -> cellData.getValue().getValueProperty());
 		
 		// Custom rendering of the date column table cell.
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd MMM");
@@ -112,10 +106,53 @@ public class NavigationLayoutController {
 					} else {
 						// Format value.
 						setText(numberFormatter.format(item));
+						
+						// Color expenses red and incomes green
+						if(item.doubleValue() < 0) {
+							setTextFill(Color.RED);
+						}
+						else {
+							setTextFill(Color.GREEN);
+						}
 					}
 				}
 			};
 		});
+	}
+	
+	/**
+	 * Called when the user adds a transaction.
+	 */
+	@FXML
+	public void handleAddTransaction() {
+		TransactionEditDialogController dialog = new TransactionEditDialogController();
+		dialog.setMainApp(budgetManager);
+		dialog.showAndWait();
+	}
+	
+	/**
+	 * Called when the user edits a transaction.
+	 */
+	@FXML
+	public void handleEditTransaction() {
+		int selectedIndex = transactionTable.getSelectionModel().getSelectedIndex();
+		if(selectedIndex >= 0) {
+			TransactionEditDialogController dialog = new TransactionEditDialogController();
+			dialog.setMainApp(budgetManager);
+			dialog.setSelectedTransaction(transactionTable.getItems().get(selectedIndex));
+			dialog.disableTypeChoice();
+			dialog.showAndWait();
+			dialog.enableTypeChoice();
+		}
+		else {
+			// Nothing selected
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Selection Error");
+			alert.setHeaderText("Transaction Edit Error");
+			alert.setContentText("You must select a transaction to edit");
+			
+			alert.showAndWait();
+		}
 	}
 	
 	/**
@@ -130,7 +167,8 @@ public class NavigationLayoutController {
 		else {
 			// Nothing selected
 			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Transaction Delete Error");
+			alert.setTitle("Selection Error");
+			alert.setHeaderText("Transaction Delete Error");
 			alert.setContentText("You must select a transaction to delete");
 			
 			alert.showAndWait();

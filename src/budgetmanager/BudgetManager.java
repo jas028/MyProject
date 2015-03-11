@@ -30,16 +30,16 @@ public class BudgetManager extends Application {
 
 	public BudgetManager() {
 		// Sample transaction data.
-		transactionData.add(new Transaction(1.00, (LocalDate.now()), "transaction 1", true));
-		transactionData.add(new Transaction(2.00, (LocalDate.now()), "transaction 2", false));
-		transactionData.add(new Transaction(500.00, (LocalDate.now()), "transaction 3", false));
-		transactionData.add(new Transaction(1000.10, (LocalDate.now()), "transaction 4", false));
-		transactionData.add(new Transaction(-12.00, (LocalDate.now()), "transaction 5 testing width of transaction description in table view", false));
-		transactionData.add(new Transaction(12.99, (LocalDate.now()), "transaction 6", false));
-		transactionData.add(new Transaction(3.25, (LocalDate.now()), "transaction 7", false));
-		transactionData.add(new Transaction(23.65, (LocalDate.now()), "transaction 8", false));
-		transactionData.add(new Transaction(234.97, (LocalDate.now()), "transaction 9", false));
-		transactionData.add(new Transaction(34.40, (LocalDate.now()), "transaction 10", false));
+		transactionData.add(new Expense(-1.00, (LocalDate.now()), "transaction 1", true, null));
+		transactionData.add(new Expense(-2.00, (LocalDate.now()), "transaction 2", false, null));
+		transactionData.add(new Expense(-500.00, (LocalDate.now()), "transaction 3", true, null));
+		transactionData.add(new Expense(-1000.10, (LocalDate.now()), "transaction 4", false, null));
+		transactionData.add(new Expense(-12.00, (LocalDate.now()), "transaction 5 testing width of transaction description in table view", false, null));
+		transactionData.add(new Income(12.99, (LocalDate.now()), "transaction 6", false, null));
+		transactionData.add(new Income(3.25, (LocalDate.now()), "transaction 7", true, null));
+		transactionData.add(new Income(23.65, (LocalDate.now()), "transaction 8", true, null));
+		transactionData.add(new Income(234.97, (LocalDate.now()), "transaction 9", false, null));
+		transactionData.add(new Income(34.40, (LocalDate.now()), "transaction 10", true, null));
 	}
 	
 	@Override
@@ -93,17 +93,17 @@ public class BudgetManager extends Application {
 	}
 	
 	/**
-	 * Creates a new Expense object and adds it to the transaction list.  Does no data validation.
+	 * Adds an Expense object to the transactionData list.
 	 */
-	public void addTransaction(Double value, LocalDate date, String description, boolean reoccuring, ExpenseCategory category) {
-		transactionData.add(new Expense(value, null, "", false, null));
+	public void addTransaction(Expense expense) {
+		transactionData.add(expense);
 	}
 	
 	/**
-	 * Creates a new Income object and adds it to the transaction list.  Does no data validation.
+	 * Adds an Expense object to the transactionData list.
 	 */
-	public void addTransaction(Double value, LocalDate date, String description, boolean reoccuring, IncomeCategory category) {
-		transactionData.add(new Income(value, date, description, reoccuring, category));
+	public void addTransaction(Income income) {
+		transactionData.add(income);
 	}
 	
 	/**

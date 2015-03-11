@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="Content" prefHeight="180.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TableView fx:id="transactionTable" prefHeight="300.0" prefWidth="600.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+         <columns>
+            <TableColumn fx:id="dateColumn" maxWidth="125.0" minWidth="75.0" prefWidth="100.0" text="Date" />
+            <TableColumn fx:id="descriptionColumn" prefWidth="75.0" text="Transaction" />
+            <TableColumn fx:id="expenseColumn" maxWidth="125.0" minWidth="75.0" prefWidth="100.0" text="Expense" />
+         </columns>
+      </TableView>
+      <HBox alignment="CENTER_RIGHT" layoutY="229.0" prefHeight="40.0" prefWidth="600.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <Button mnemonicParsing="false" onAction="#handleAddTransaction" text="Add..." />
+            <Button mnemonicParsing="false" text="Edit..." />
+            <Button mnemonicParsing="false" onAction="#handleDeleteTransaction" text="Delete..." />
+         </children>
+         <padding>
+            <Insets right="10.0" />
+         </padding>
+      </HBox>
+   </children>
+</AnchorPane>

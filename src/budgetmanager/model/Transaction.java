@@ -39,15 +39,15 @@ public class Transaction {
 		this.reoccuring = new SimpleBooleanProperty(reoccuring);
 	}
 	
-	public Double getExpense() {
+	public Double getValue() {
 		return expense.get();
 	}
 	
-	public void setExpense(Double expense) {
+	public void setValue(Double expense) {
 		this.expense.set(expense);
 	}
 	
-	public DoubleProperty getExpenseProperty() {
+	public DoubleProperty getValueProperty() {
 		return expense;
 	}
 	
