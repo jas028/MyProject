@@ -152,11 +152,17 @@ public class TransactionEditDialogController extends Stage implements Initializa
 		
 		reoccuringCheckBox.setSelected(selectedTransaction.getReoccuring());
 		
-		valueField.setText(Double.toString(selectedTransaction.getValue()));
-		
 		descriptionField.setText(selectedTransaction.getDescription());
 		
 		datePicker.setValue(selectedTransaction.getDate());
+		
+		double value = selectedTransaction.getValue();
+		if(value < 0) {
+			valueField.setText(Double.toString(0-value));
+		}
+		else {
+			valueField.setText(Double.toString(value));
+		}
 	}
 	
 	public void disableTypeChoice() {
