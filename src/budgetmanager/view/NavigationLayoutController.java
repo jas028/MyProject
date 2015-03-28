@@ -52,6 +52,20 @@ public class NavigationLayoutController {
 	@FXML
 	private TableColumn<Debt, Number> debtColRate;
 	
+	// Overview Variables
+	@FXML
+	private Label loginNameLabel;
+	@FXML
+	private Label totalIncomeLabel;
+	@FXML
+	private Label totalExpendituresLabel;
+	@FXML
+	private Label netLabel;
+	@FXML
+	private DatePicker startDatePicker;
+	@FXML
+	private DatePicker endDatePicker;
+	
 	// Reference to main app.
 	private BudgetManager budgetManager;
 	
@@ -171,6 +185,20 @@ public class NavigationLayoutController {
 				}
 			};
 		});
+	}
+	
+	@FXML
+	public void handleOverviewDatePicker() {
+		try {
+			
+			budgetManager.calcOverviewTotals(startDatePicker.getValue(), endDatePicker.getValue());
+			totalIncomeLabel.setText(Double.toString(budgetManager.overviewTotals.getIncomeTotal()));
+			totalExpendituresLabel.setText(Double.toString(budgetManager.overviewTotals.getExpenseTotal()));
+			netLabel.setText(Double.toString(budgetManager.overviewTotals.getNetTotal()));
+			
+		} catch(NullPointerException e) {
+			
+		}
 	}
 	
 	/**

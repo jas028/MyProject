@@ -1,11 +1,10 @@
 package budgetmanager.util;
 
 public enum ExpenseCategory {
-	GENERAL,
+	MISCELLANEOUS,
 	HOUSING,
-	INSURANCE,
-	UTILITY,
-	DINING,
+	BILL,
+	FOOD,
 	RECREATION,
 	SAVINGS
 }
