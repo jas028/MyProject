@@ -99,7 +99,7 @@ public class NavigationLayoutController {
 		});
 		
 		// Custom rendering of the expense column table cell.
-		NumberFormat numberFormatter = new DecimalFormat("$###,###.00");
+		NumberFormat numberFormatter = new DecimalFormat("$###,##0.00");
 		expenseColumn.setCellFactory(column -> {
 			return new TableCell<Transaction, Number>() {
 				@Override
@@ -191,13 +191,30 @@ public class NavigationLayoutController {
 	public void handleOverviewDatePicker() {
 		try {
 			
+			// Clear old fields
+			totalIncomeLabel.setText(null);
+			totalExpendituresLabel.setText(null);
+			netLabel.setText(null);
+			
+			// Calculate totals needed for overview fields
 			budgetManager.calcOverviewTotals(startDatePicker.getValue(), endDatePicker.getValue());
-			totalIncomeLabel.setText(Double.toString(budgetManager.overviewTotals.getIncomeTotal()));
-			totalExpendituresLabel.setText(Double.toString(budgetManager.overviewTotals.getExpenseTotal()));
-			netLabel.setText(Double.toString(budgetManager.overviewTotals.getNetTotal()));
+			
+			// Set and format
+			NumberFormat numberFormatter = new DecimalFormat("$###,##0.00");
+			totalIncomeLabel.setText(numberFormatter.format(budgetManager.overviewTotals.getIncomeTotal()));
+			totalExpendituresLabel.setText(numberFormatter.format(budgetManager.overviewTotals.getExpenseTotal()));
+			netLabel.setText(numberFormatter.format(budgetManager.overviewTotals.getNetTotal()));
 			
 		} catch(NullPointerException e) {
 			
+		} catch(Exception e) {
+			// Invalid date range
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Date Range Error");
+			alert.setContentText("You must select a valid date range");
+
+			alert.showAndWait();
 		}
 	}
 	

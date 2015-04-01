@@ -100,15 +100,19 @@ public class BudgetManager extends Application {
 	
 	/**
 	 * Calculates totals for incomes, expenses, and subexpenses.
+	 * @throws Exception 
 	 */
-	public void calcOverviewTotals(LocalDate start, LocalDate end) {
+	public void calcOverviewTotals(LocalDate start, LocalDate end) throws Exception {
 		Double incomeTotal = 0.0, expenseTotal = 0.0, miscellaneousTotal = 0.0, housingTotal = 0.0,
 				billTotal = 0.0, foodTotal = 0.0, recreationTotal = 0.0, savingsTotal = 0.0, netTotal = 0.0;
+		
+		if(start.isAfter(end)) {
+			throw new Exception("Invalid date range");
+		}
 		
 		for(Transaction transaction: transactionData) {
 			if((transaction.getDate().isEqual(start) || transaction.getDate().isAfter(start))
 					&& (transaction.getDate().isEqual(end) || transaction.getDate().isBefore(end))) {
-				System.out.println("in range");
 				
 				if(transaction instanceof Income) {
 					incomeTotal += transaction.getValue();
