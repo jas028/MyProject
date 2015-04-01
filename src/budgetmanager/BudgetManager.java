@@ -28,7 +28,7 @@ public class BudgetManager extends Application {
 	private NavigationLayoutController navigationLayoutController;
 	
 	public Totals overviewTotals = new Totals();
-	private ObservableList<PieChart.Data> overviewChartData = FXCollections.observableArrayList();
+	public ObservableList<PieChart.Data> overviewChartData = FXCollections.observableArrayList();
 	
 	private ObservableList<Transaction> transactionData = FXCollections.observableArrayList();
 	
@@ -154,6 +154,14 @@ public class BudgetManager extends Application {
 		overviewTotals.setRecreationTotal(recreationTotal);
 		overviewTotals.setSavingsTotal(savingsTotal);
 		
+		// Update pie chart data
+		overviewChartData.clear();
+		overviewChartData.addAll(
+							new PieChart.Data("Miscellaneous", (miscellaneousTotal/expenseTotal*100)),
+							new PieChart.Data("Housing", (housingTotal/expenseTotal*100)),
+							new PieChart.Data("Bills", (billTotal/expenseTotal*100)),
+							new PieChart.Data("Recreation", (recreationTotal/expenseTotal*100)),
+							new PieChart.Data("Savings", (savingsTotal/expenseTotal*100)));
 	}
 	
 	/**

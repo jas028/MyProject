@@ -32,7 +32,7 @@
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <PieChart GridPane.columnIndex="2" GridPane.columnSpan="2147483647" />
+                              <PieChart fx:id="overviewChart" title="Expense Breakdown" GridPane.columnIndex="2" GridPane.rowSpan="2147483647" />
                               <Label fx:id="loginNameLabel" />
                               <Label text="Total Income" GridPane.rowIndex="3" />
                               <DatePicker fx:id="startDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="1" />

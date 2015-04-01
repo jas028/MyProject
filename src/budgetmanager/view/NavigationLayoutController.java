@@ -9,6 +9,7 @@ import budgetmanager.BudgetManager;
 import budgetmanager.model.Debt;
 import budgetmanager.model.Transaction;
 import javafx.fxml.FXML;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.paint.Color;
@@ -65,6 +66,8 @@ public class NavigationLayoutController {
 	private DatePicker startDatePicker;
 	@FXML
 	private DatePicker endDatePicker;
+	@FXML
+	private PieChart overviewChart;
 	
 	// Reference to main app.
 	private BudgetManager budgetManager;
@@ -205,6 +208,8 @@ public class NavigationLayoutController {
 			totalExpendituresLabel.setText(numberFormatter.format(budgetManager.overviewTotals.getExpenseTotal()));
 			netLabel.setText(numberFormatter.format(budgetManager.overviewTotals.getNetTotal()));
 			
+			// Update pie chart
+			overviewChart.setData(budgetManager.overviewChartData);
 		} catch(NullPointerException e) {
 			
 		} catch(Exception e) {
