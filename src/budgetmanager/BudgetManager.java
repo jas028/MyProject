@@ -2,6 +2,7 @@ package budgetmanager;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import budgetmanager.model.*;
 import budgetmanager.util.ExpenseCategory;
@@ -156,13 +157,28 @@ public class BudgetManager extends Application {
 		
 		// Update pie chart data
 		overviewChartData.clear();
-		overviewChartData.addAll(
-							new PieChart.Data("Miscellaneous", (miscellaneousTotal/expenseTotal*100)),
-							new PieChart.Data("Housing", (housingTotal/expenseTotal*100)),
-							new PieChart.Data("Bills", (billTotal/expenseTotal*100)),
-							new PieChart.Data("Food", (foodTotal/expenseTotal*100)),
-							new PieChart.Data("Recreation", (recreationTotal/expenseTotal*100)),
-							new PieChart.Data("Savings", (savingsTotal/expenseTotal*100)));
+		ArrayList<Double> breakdownList = new ArrayList<Double>();
+		breakdownList.add((miscellaneousTotal/expenseTotal*100));
+		breakdownList.add((housingTotal/expenseTotal*100));
+		breakdownList.add((billTotal/expenseTotal*100));
+		breakdownList.add((foodTotal/expenseTotal*100));
+		breakdownList.add((recreationTotal/expenseTotal*100));
+		breakdownList.add((savingsTotal/expenseTotal*100));
+		ArrayList<String> categoriesList = new ArrayList<String>();
+		categoriesList.add("Miscellaneous");
+		categoriesList.add("Housing");
+		categoriesList.add("Bills");
+		categoriesList.add("Food");
+		categoriesList.add("Recreation");
+		categoriesList.add("Savings");
+		
+		int i = 0;
+		for(Double percentage: breakdownList) {
+			if (percentage != 0) {
+				overviewChartData.add(new PieChart.Data(categoriesList.get(i), percentage));
+			}
+			++i;
+		}
 	}
 	
 	/**
