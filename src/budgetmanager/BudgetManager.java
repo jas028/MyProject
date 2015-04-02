@@ -160,6 +160,7 @@ public class BudgetManager extends Application {
 							new PieChart.Data("Miscellaneous", (miscellaneousTotal/expenseTotal*100)),
 							new PieChart.Data("Housing", (housingTotal/expenseTotal*100)),
 							new PieChart.Data("Bills", (billTotal/expenseTotal*100)),
+							new PieChart.Data("Food", (foodTotal/expenseTotal*100)),
 							new PieChart.Data("Recreation", (recreationTotal/expenseTotal*100)),
 							new PieChart.Data("Savings", (savingsTotal/expenseTotal*100)));
 	}

@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 import budgetmanager.BudgetManager;
 import budgetmanager.model.*;
+import budgetmanager.util.ExpenseCategory;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -19,6 +20,8 @@ public class TransactionEditDialogController extends Stage implements Initializa
 	
 	@FXML
 	private ChoiceBox<String> typeChoice;
+	@FXML
+	private ChoiceBox<String> categoryChoice;
 	@FXML
 	private TextField valueField;
 	@FXML
@@ -63,6 +66,19 @@ public class TransactionEditDialogController extends Stage implements Initializa
 					Expense transaction = new Expense(value,
 							datePicker.getValue(), descriptionField.getText(),
 							reoccuringCheckBox.isSelected(), null);
+					if(categoryChoice.getValue().matches("Housing")) {
+						transaction.setCategory(ExpenseCategory.HOUSING);
+					} else if(categoryChoice.getValue().matches("Bill")) {
+						transaction.setCategory(ExpenseCategory.BILL);
+					} else if(categoryChoice.getValue().matches("Recreation")) {
+						transaction.setCategory(ExpenseCategory.RECREATION);
+					} else if(categoryChoice.getValue().matches("Savings")) {
+						transaction.setCategory(ExpenseCategory.SAVINGS);
+					} else if(categoryChoice.getValue().matches("Food")) {
+						transaction.setCategory(ExpenseCategory.FOOD);
+					} else if(categoryChoice.getValue().matches("Miscellaneous")) {
+						transaction.setCategory(ExpenseCategory.MISCELLANEOUS);
+					}
 					budgetManager.addTransaction(transaction);
 				} else if (typeChoice.getValue().matches("Income")) {
 					if(value < 0) {
@@ -148,6 +164,7 @@ public class TransactionEditDialogController extends Stage implements Initializa
 		}
 		else if(selectedTransaction instanceof Income) {
 			typeChoice.getSelectionModel().selectLast();
+			disableCategoryChoice();
 		}
 		
 		reoccuringCheckBox.setSelected(selectedTransaction.getReoccuring());
@@ -171,6 +188,25 @@ public class TransactionEditDialogController extends Stage implements Initializa
 
 	public void enableTypeChoice() {
 		typeChoice.setDisable(false);
+	}
+	
+	public void disableCategoryChoice() {
+		categoryChoice.setDisable(true);
+	}
+
+	public void enableCategoryChoice() {
+		categoryChoice.setDisable(false);
+	}
+	
+	@FXML
+	public void handleTypeSelect() {
+		if(typeChoice.getValue() != null && typeChoice.getValue().equals("Expense")) {
+			categoryChoice.getItems().clear();
+			categoryChoice.getItems().addAll("Housing", "Bill", "Recreation", "Food", "Savings", "Miscellaneous");
+		}
+		else {
+			categoryChoice.getItems().clear();
+		}
 	}
 	
 	public void setSavingsCalcInfo(Double value, boolean reoccuring) {
