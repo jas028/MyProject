@@ -198,6 +198,11 @@ public class NavigationLayoutController {
 	public void handleOverviewDatePicker() {
 		try {
 			
+			// Set email
+			if(loginNameLabel.getText().equals("")) {
+				loginNameLabel.setText(budgetManager.emailPassword.getKey());
+			}
+			
 			// Clear old fields
 			totalIncomeLabel.setText(null);
 			totalExpendituresLabel.setText(null);

@@ -3,19 +3,31 @@ package budgetmanager;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import budgetmanager.model.*;
 import budgetmanager.util.ExpenseCategory;
 import budgetmanager.view.NavigationLayoutController;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 /**
  * Main class execution is invoked upon.
@@ -28,6 +40,8 @@ public class BudgetManager extends Application {
 	private AnchorPane navigationLayout;
 	private NavigationLayoutController navigationLayoutController;
 	
+	public Pair<String, String> emailPassword;
+	
 	public Totals overviewTotals = new Totals();
 	public ObservableList<PieChart.Data> overviewChartData = FXCollections.observableArrayList();
 	
@@ -36,6 +50,10 @@ public class BudgetManager extends Application {
 	private ObservableList<Debt> debtData = FXCollections.observableArrayList();
 
 	public BudgetManager() {
+		
+		// Email accessed by "emailPassword.getKey()", password accessed by "emailPassword.getValue()"
+		emailPassword = loginDialog();
+		
 		// Sample transaction data.
 		transactionData.add(new Expense(-200.00, (LocalDate.now()), "Camping Trip", false, ExpenseCategory.RECREATION));
 		transactionData.add(new Expense(-100.00, (LocalDate.now()), "Savings Deposit", false, ExpenseCategory.SAVINGS));
@@ -102,6 +120,61 @@ public class BudgetManager extends Application {
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Shows dialog for email password pair.
+	 * 
+	 * @return Pair<String, String>
+	 */
+	public Pair<String, String> loginDialog() {
+		Dialog<Pair<String, String>> loginDialog = new Dialog<>();
+		loginDialog.setTitle("Login");
+		
+		ButtonType loginButtonType = new ButtonType("Login", ButtonData.OK_DONE);
+		loginDialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+		
+		// Create the email and password labels and fields.
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(20, 150, 10, 10));
+
+		TextField email = new TextField();
+		email.setPromptText("Email");
+		PasswordField password = new PasswordField();
+		password.setPromptText("Password");
+
+		grid.add(new Label("Email:"), 0, 0);
+		grid.add(email, 1, 0);
+		grid.add(new Label("Password:"), 0, 1);
+		grid.add(password, 1, 1);
+		
+		// Enable/Disable login button depending on whether a email was entered.
+		Node loginButton = loginDialog.getDialogPane().lookupButton(loginButtonType);
+		loginButton.setDisable(true);
+
+		// Do some validation (using the Java 8 lambda syntax).
+		email.textProperty().addListener((observable, oldValue, newValue) -> {
+		    loginButton.setDisable(newValue.trim().isEmpty());
+		});
+
+		loginDialog.getDialogPane().setContent(grid);
+		
+		// Request focus on the email field by default.
+		Platform.runLater(() -> email.requestFocus());
+
+		// Convert the result to a email-password-pair when the login button is clicked.
+		loginDialog.setResultConverter(dialogButton -> {
+		    if (dialogButton == loginButtonType) {
+		        return new Pair<>(email.getText(), password.getText());
+		    }
+		    return null;
+		});
+
+		Optional<Pair<String, String>> result = loginDialog.showAndWait();
+		
+		return result.get();
 	}
 	
 	/**
