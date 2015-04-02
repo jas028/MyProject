@@ -188,6 +188,10 @@ public class NavigationLayoutController {
 				}
 			};
 		});
+		
+		// Set default start and end dates for overview tab 
+		startDatePicker.setValue(LocalDate.now());
+		endDatePicker.setValue(startDatePicker.getValue().plusMonths(1));
 	}
 	
 	@FXML
