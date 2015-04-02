@@ -2,6 +2,8 @@ package budgetmanager.mysql;
 import java.sql.*;
 import java.util.ArrayList;
 
+import com.mysql.jdbc.Util;
+
 import budgetmanager.model.*;
 
 public class MySqlConnect {
@@ -13,11 +15,16 @@ public class MySqlConnect {
 	//constructor to make connection to database
 	public MySqlConnect() throws Exception{
 		try{
-			//uses jar file to make connection to database
-			Class.forName("com.mysql.jdbc.Driver");
+			//uses jar file to make connection to database;
 			//connect to the server
-			con = DriverManager.getConnection("jdbc:mysql://localhost::3306/financialsystem", "root", "Tywin0002");
-			
+			String driver = "com.mysql.jdbc.Driver";
+			String url = "jdbc:mysql://localhost:3306/my_database";
+			String user = "root";
+			String password = "Wrigley1!";
+			Class.forName(driver);
+			//Right now this has no database in it. I've emailed the server admin to figure out why the packet is too big
+			//When I just try to connect with no other information.
+			con = DriverManager.getConnection(url,user,password);
 		//if exception
 		}catch(Exception ex){System.out.println("Error: " + ex);}
 		finally{
@@ -29,16 +36,16 @@ public class MySqlConnect {
 	public void insertUser(User user) throws Exception{
 		try{
 			//set MySql insert statement
-			String query = "INSERT INTO users(f_name, l_name, email, user_name, pass_word)"
-					+ " values(?, ?, ?, ?, ?)";
+			PreparedStatement create = con.prepareStatement("CREATE TABLE IF NOT EXISTS users(email varchar(255), "
+					+ "pass_word varchar(255))");
+			create.executeUpdate();
+			String query = "INSERT INTO users(email, pass_word)"
+					+ " values(?, ?)";
 
 			//set insert variables
 			pst = con.prepareStatement(query);
-			pst.setString(1, user.getF_name());
-			pst.setString(2, user.getL_name());
-			pst.setString(3, user.getEmail());
-			pst.setString(4, user.getUser_name());
-			pst.setString(5, user.getPass_word());
+			pst.setString(1, user.getEmail());
+			pst.setString(2, user.getPass_word());
 
 			//execute statement
 			pst.executeUpdate();
@@ -50,26 +57,26 @@ public class MySqlConnect {
 	}
 	
 	//insert a new loan
-	public void insertLoan(String user_name, Debt debt) throws Exception{
-		//generate unique primary key
-		int id = hashTable(user_name, debt.getName());
-		
+	public void insertLoan(String email, Debt debt) throws Exception{
 		try{
+			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS loans(email varchar(255), "
+					+ "name varchar(255), balance double, rate double, payment double)");
 			//set MySql insert statement
-			String query = "INSERT INTO loans(id, user_name, name, balance, rate, payment)"
-					+ " VALUES(?, ?, ?, ?, ?, ?)";
+			pst.executeUpdate();
+			
+			String query = "INSERT INTO loans(email, name, balance, rate, payment)"
+					+ " VALUES(?, ?, ?, ?, ?)";
 			
 			//set insert variables
 			pst = con.prepareStatement(query);
-			pst.setInt    (1, id);
-			pst.setString (2, user_name);
-			pst.setString (3, debt.getName());
-			pst.setDouble (4, debt.getBalance());
-			pst.setDouble (5, debt.getRate());
-			pst.setDouble (6, debt.getPayment());
+			pst.setString (1, email);
+			pst.setString (2, debt.getName());
+			pst.setDouble (3, debt.getBalance());
+			pst.setDouble (4, debt.getRate());
+			pst.setDouble (5, debt.getPayment());
 
 			//execute statement
-			pst.execute();
+			pst.executeUpdate();
 
 		}catch(Exception ex){System.out.println("Error: " + ex);}
 		finally{
@@ -78,26 +85,28 @@ public class MySqlConnect {
 	}
 	
 	//insert a new transaction
-	public void insertTransaction(String user_name, Transaction transaction) throws Exception{
-		//generate unique primary key
-		int id = hashTable(user_name, transaction.getValue().toString());
-		
+	public void insertIncome(String email, Income income) throws Exception{
+		java.util.Date utilDate = new java.util.Date();
+	    java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
 		try{
-			//set MySql insert statement
-			String query = "INSERT INTO transactions(id, user_name, amount, date, description, reoccuring)"
-					+ " VALUES(?, ?, ?, ?, ?, ?)";
+			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS transactions(email varchar(255), "
+					+ "amount double, date date, description varchar(255), reoccuring boolean)");
+			//create new table if it doesn't exist
+			pst.executeUpdate();
+			
+			String query = "INSERT INTO transactions(email, amount, date, description, reoccuring)"
+					+ "VALUES(?,?,?,?,?)";
 			
 			//set insert variables
 			pst = con.prepareStatement(query);
-			pst.setInt    (1, id);
-			pst.setString (2, user_name);
-			pst.setDouble (3, transaction.getValue());
-			pst.setDate   (4, Date.valueOf(transaction.getDate()));
-			pst.setString (5, transaction.getDescription());
-			pst.setBoolean(6, transaction.getReoccuring());
+			pst.setString (1, email);
+			pst.setDouble (2, income.getValue());
+			pst.setDate (3, sqlDate);
+			pst.setString   (4, income.getDescription());
+			pst.setBoolean (5, income.getReoccuring());
 
 			//execute statement
-			pst.execute();
+			pst.executeUpdate();
 
 		}catch(Exception ex){System.out.println("Error: " + ex);}
 		finally{
@@ -105,15 +114,38 @@ public class MySqlConnect {
 		}		
 	}
 	
+	public void insertExpense(String email, Expense expense){
+		java.util.Date utilDate = new java.util.Date();
+	    java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+		try{
+			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS transactions(email varchar(255), "
+					+ "amount double, date date, description varchar(255), reoccuring boolean)");
+			pst.executeUpdate();
+			//removed date
+			String query = "INSERT INTO transactions(email, amount, date, description, reoccuring)"
+					+ "VALUES(?,?,?,?,?)";
+			pst = con.prepareStatement(query);
+			pst.setString(1,email);
+			pst.setDouble(2,expense.getValue());
+			pst.setDate(3, sqlDate);
+			pst.setString(4, expense.getDescription());
+			pst.setBoolean(5, expense.getReoccuring());
+			pst.execute();
+		}catch(Exception ex){
+			System.out.println("Error: " + ex);
+		}finally{
+			System.out.println("new expense inserted");
+		}
+	}
 	//find if user is in the system
-	public Boolean validUser(String user_name, String pass_word) throws Exception{
+	public Boolean validUser(String email, String pass_word) throws Exception{
 		try{
 			//MySql select statement
-			String query = "SELECT * FROM users WHERE user_name = ? AND pass_word = ?";
+			String query = "SELECT * FROM users WHERE email = ? AND pass_word = ?";
 			
 			//set variables
 			pst = con.prepareStatement(query);
-			pst.setString(1, user_name);
+			pst.setString(1, email);
 			pst.setString(2, pass_word);
 			
 			//execute select statement
@@ -124,83 +156,81 @@ public class MySqlConnect {
 				return true;
 			
 		}catch(Exception ex){System.out.println("Error: " + ex);}
-		return false;
+			return false;
 	}
+
 	
 	//get all info for a user
-	public User selectUser(String user_name) throws Exception{
+	public User selectUser(String email, String pass_word) throws Exception{
 		User user = new User();
 		try{
 			//MySql select statement with username condition
-			String query = "SELECT * FROM users WHERE user_name = ?";
+			//Changed this to a PreparedStatement because of SQLException
+			//pst is prepared statement
+			pst = con.prepareStatement("SELECT * FROM users WHERE email = ? and pass_word = ?");
 			
 			//set variables
-			pst = con.prepareStatement(query);
-			pst.setString(1, user_name);
+			pst.setString(1, email);
+			pst.setString(2, pass_word);
 			
-			//execute select statement
+			//Execute PreparedStatement to get all user info.
 			rs = pst.executeQuery();
 			
-			//save user from the database
-			user.setF_name(rs.getString("first_name"));
-			user.setL_name(rs.getString("last_name"));
-			user.setEmail(rs.getString("email"));
-			user.setUser_name(rs.getString("user_name"));
-			user.setPass_word(rs.getString("pass_word"));
-			
-			//return desired user
-			return user;
-			
-		}catch(Exception ex){System.out.println("Error: " + ex);}
-		return null;
+			//Loop to get all relevant data from table if it exists
+			//Returns user upon completion
+			while(rs.next() != false){
+				System.out.print(rs.getString("email") + " ");
+				user.setEmail(rs.getString("email"));
+				System.out.print(rs.getString("pass_word") + " ");
+				user.setPass_word(rs.getString("pass_word"));
+				return user;
+			}
+			//If email or password are incorrect user is informed
+			System.out.print("invalid username and/or password");
+			return null;
+		}catch(SQLException ex){
+			System.out.println(ex);
+			return null;
+		}
 	}
 	
 	//get list of all debts from user
-	public ArrayList<Debt> selectLoan(String user_name) throws Exception{
+	public ArrayList<Debt> selectLoan(String email) throws Exception{
 		ArrayList<Debt> debtList = new ArrayList<Debt>();
 		Debt debt = new Debt();
 		try{
-			String query = "SELECT * FROM loans WHERE user_name = ?";
+			pst = con.prepareStatement("SELECT * FROM loans WHERE email = ?");
+			pst.setString(1, email);
+			rs = pst.executeQuery();
 			
-			pst = con.prepareStatement(query);
-			pst.setString(1, user_name);
-			
-			rs = pst.executeQuery(query);
-			
-			while(rs.next()){
+			while(rs.next() != false){
 				debt.setName(rs.getString("name"));
 				debt.setBalance(rs.getDouble("balance"));
 				debt.setRate(rs.getDouble("rate"));
 				debt.setPayment(rs.getDouble("payment"));
-				
 				debtList.add(debt);
 			}
-
 			return debtList;
-			
 		}catch(Exception ex){System.out.println("Error: " + ex);}
 		return null;
 	}
 	
 	//get list of all transactions from user
-	public ArrayList<Transaction> selectExpense(String user_name) throws Exception{
-		ArrayList<Transaction> expenseList = new ArrayList<Transaction>();
-		Transaction transaction = new Transaction();
+	public ArrayList<Expense> selectExpense(String email) throws Exception{
+		ArrayList<Expense> expenseList = new ArrayList<Expense>();
+		Expense expense = new Expense();
 		try{
-			String query = "SELECT * FROM transactions WHERE user_name = ?";
+			pst = con.prepareStatement("SELECT * FROM transactions WHERE email = ?");
+			pst.setString(1, email);
+			rs = pst.executeQuery();
 			
-			pst = con.prepareStatement(query);
-			pst.setString(1, user_name);
-			
-			rs = pst.executeQuery(query);
-			
-			while(rs.next()){
-				transaction.setValue(rs.getDouble("amount"));
-				transaction.setDate(rs.getDate("date").toLocalDate());
-				transaction.setDescription(rs.getString("description"));
-				transaction.setReoccuring(rs.getBoolean("reoccuring"));
-				
-				expenseList.add(transaction);
+			while(rs.next() != false){
+				System.out.print(rs.getDate("date").toLocalDate());
+				expense.setValue(rs.getDouble("amount"));
+				expense.setDate(rs.getDate("date").toLocalDate());
+				expense.setDescription(rs.getString("description"));
+				expense.setReoccuring(rs.getBoolean("reoccuring"));
+				expenseList.add(expense);
 			}
 			
 			return expenseList;
@@ -211,56 +241,89 @@ public class MySqlConnect {
 		return null;
 	}
 	
-	//delete a user and all its information
-	public void deleteUser(String user_name) throws Exception{
+	public ArrayList<Income> selectIncome(String email) throws Exception{
+		ArrayList<Income> incomeList = new ArrayList<Income>();
+		Income income = new Income();
 		try{
-			String query = "DELETE FROM users WHERE user_name = ?";
+			pst = con.prepareStatement("SELECT * FROM transactions WHERE email = ?");
+			pst.setString(1, email);
+			rs = pst.executeQuery();
+			
+			while(rs.next() != false){
+				System.out.print(rs.getDate("date").toLocalDate());
+				income.setValue(rs.getDouble("amount"));
+				income.setDate(rs.getDate("date").toLocalDate());
+				income.setDescription(rs.getString("description"));
+				income.setReoccuring(rs.getBoolean("reoccuring"));
+				incomeList.add(income);
+			}
+			return incomeList;
+		}catch(Exception ex){
+			System.out.println("Error: " + ex);
+		}
+		return null;
+	}
+	
+	//delete a user and all its information
+	public void deleteUser(String email) throws Exception{
+		try{
+			String query = "DELETE FROM users WHERE email = ?";
 			pst = con.prepareStatement(query);
-			pst.setString(1, user_name);
+			pst.setString(1, email);
 			
 			pst.executeUpdate();
 			
 			query = "DELETE FROM transactions WHERE user_name = ?";
 			pst = con.prepareStatement(query);
-			pst.setString(1, user_name);
+			pst.setString(1, email);
 			
 			pst.executeUpdate();
 			
 			query = "DELETE FROM loans WHERE user_name = ?";
 			pst = con.prepareStatement(query);
-			pst.setString(1, user_name);
+			pst.setString(1, email);
 			
 			pst.executeUpdate();
 			
 		}catch(Exception ex){System.out.println("Error: " + ex);}	
 	}
 	
-	//delete a single transaction using the primary key
-	public void deleteTransaction(String user_name, Transaction transaction) throws Exception{
-		int id = hashTable(user_name, transaction.getValue().toString());
-		
+	//delete a single income
+	public void deleteIncome(String email, Income income) throws Exception{
+		java.util.Date utilDate = new java.util.Date();
+	    java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
 		try{
-			String query = "DELETE FROM transaction WHERE id = ?";
+			String query = "DELETE FROM transactions WHERE email = ? and description = ?";
 			pst = con.prepareStatement(query);
-			pst.setInt(1, id);
-
+			pst.setString(1,email);
+			pst.setString(2, income.getDescription());
 			pst.executeUpdate();
 			
 		}catch(Exception ex){System.out.println("Error: " + ex);}	
+	}
+	//delete a single expense
+	public void deleteExpense(String email, Expense expense) throws Exception{
+		java.util.Date utilDate = new java.util.Date();
+		java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+		try{
+			String query = "DELETE FROM transactions WHERE email = ? and description = ?";
+			pst = con.prepareStatement(query);
+			pst.setString(1, email);
+			pst.setString(2, expense.getDescription());
+			pst.executeUpdate();
+		}catch(Exception ex){
+			System.out.println("Error: " + ex);
+		}
 	}
 	
 	//delete a single loan using the primary key
-	public void deleteLoans(String user_name, Debt debt) throws Exception{
-		int id = hashTable(user_name, debt.getName());
-		
+	public void deleteLoans(String email, Debt debt) throws Exception{
 		try{
-			String query = "DELETE FROM loans WHERE id = ?";
-			
+			String query = "DELETE FROM loans WHERE email = ?";// and name = ?";
 			pst = con.prepareStatement(query);
-			pst.setInt(1, id);
-			
+			pst.setString(1,email);
+			//pst.setString(2, debt.getName());
 			pst.executeUpdate();
-			
 		}catch(Exception ex){System.out.println("Error: " + ex);}	
 	}
 	
