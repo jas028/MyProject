@@ -52,7 +52,11 @@ public class BudgetManager extends Application {
 	public BudgetManager() {
 		
 		// Email accessed by "emailPassword.getKey()", password accessed by "emailPassword.getValue()"
-		emailPassword = loginDialog();
+		try {
+			emailPassword = loginDialog();
+		} catch (Exception e) {
+			Platform.exit();
+		}
 		
 		// Sample transaction data.
 		transactionData.add(new Expense(-200.00, (LocalDate.now()), "Camping Trip", false, ExpenseCategory.RECREATION));
@@ -79,6 +83,11 @@ public class BudgetManager extends Application {
 		initRootLayout();
 		
 		initNavigationLayout();
+	}
+	
+	@Override
+	public void stop() {
+		// Insert database saving here
 	}
 
 	/**
