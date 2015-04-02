@@ -98,6 +98,7 @@ public class BudgetManager extends Application {
 			// Load the navigation layout controller.
 			navigationLayoutController = (NavigationLayoutController) loader.getController();
 			navigationLayoutController.setMainApp(this);
+			navigationLayoutController.handleOverviewDatePicker();
 		} catch(IOException e) {
 			e.printStackTrace();
 		}

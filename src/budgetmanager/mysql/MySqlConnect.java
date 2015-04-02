@@ -2,7 +2,7 @@ package budgetmanager.mysql;
 import java.sql.*;
 import java.util.ArrayList;
 
-import com.mysql.jdbc.Util;
+//import com.mysql.jdbc.Util;
 
 import budgetmanager.model.*;
 
