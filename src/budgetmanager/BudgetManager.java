@@ -37,11 +37,15 @@ public class BudgetManager extends Application {
 
 	public BudgetManager() {
 		// Sample transaction data.
-		transactionData.add(new Expense(-7.50, (LocalDate.now()), "George's Grill", false, ExpenseCategory.RECREATION));
-		transactionData.add(new Expense(-5.00, (LocalDate.now()), "Parking", false, ExpenseCategory.MISCELLANEOUS));
-		transactionData.add(new Expense(-650.00, (LocalDate.of(2015, 3, 8)), "Rent", true, ExpenseCategory.HOUSING));
+		transactionData.add(new Expense(-200.00, (LocalDate.now()), "Camping Trip", false, ExpenseCategory.RECREATION));
+		transactionData.add(new Expense(-100.00, (LocalDate.now()), "Savings Deposit", false, ExpenseCategory.SAVINGS));
+		transactionData.add(new Expense(-120.42, (LocalDate.now()), "Cable Bill", false, ExpenseCategory.BILL));
+		transactionData.add(new Expense(-125.00, (LocalDate.now()), "Groceries", false, ExpenseCategory.FOOD));
+		transactionData.add(new Expense(-779.51, (LocalDate.now()), "New Laptop", false, ExpenseCategory.MISCELLANEOUS));
+		transactionData.add(new Expense(-650.00, (LocalDate.now()), "Rent", true, ExpenseCategory.HOUSING));
+		transactionData.add(new Income(2250.75, (LocalDate.now()), "Paycheck", false, null));
 		transactionData.add(new Income(1264.43, (LocalDate.of(2015, 3, 5)), "Tax Return", false, null));
-		transactionData.add(new Income(367.48, (LocalDate.of(2015, 3, 1)), "Paycheck", true, null));
+		transactionData.add(new Income(367.72, (LocalDate.of(2015, 3, 1)), "Paycheck", true, null));
 		transactionData.add(new Expense(-98.10, (LocalDate.of(2015, 2, 20)), "Electricity", false, ExpenseCategory.BILL));
 		
 		// Sample debt data
