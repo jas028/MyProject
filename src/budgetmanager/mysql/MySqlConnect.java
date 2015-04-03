@@ -1,10 +1,14 @@
 package budgetmanager.mysql;
 import java.sql.*;
+
+import budgetmanager.util.ExpenseCategory;
+
 import java.util.ArrayList;
 
 //import com.mysql.jdbc.Util;
 
 import budgetmanager.model.*;
+import budgetmanager.util.ExpenseCategory;
 
 public class MySqlConnect {
 	
@@ -12,8 +16,7 @@ public class MySqlConnect {
 	private PreparedStatement pst;
 	private ResultSet rs;
 	
-	//constructor to make connection to database
-	public MySqlConnect() throws Exception{
+	public MySqlConnect() throws Exception{	
 		try{
 			//uses jar file to make connection to database;
 			//connect to the server
@@ -85,17 +88,18 @@ public class MySqlConnect {
 	}
 	
 	//insert a new transaction
-	public void insertIncome(String email, Income income) throws Exception{
+	public void insertIncome(User user, Transaction income) throws Exception{
 		java.util.Date utilDate = new java.util.Date();
 	    java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
 		try{
-			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS transactions(email varchar(255), "
-					+ "amount double, date date, description varchar(255), reoccuring boolean)");
+			String email = user.getEmail();
+			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS incomes(email varchar(255), "
+					+ "amount double, date date, description varchar(255), reoccuring boolean, password varchar(255))");
 			//create new table if it doesn't exist
 			pst.executeUpdate();
 			
-			String query = "INSERT INTO transactions(email, amount, date, description, reoccuring)"
-					+ "VALUES(?,?,?,?,?)";
+			String query = "INSERT INTO incomes(email, amount, date, description, reoccuring, password)"
+					+ "VALUES(?,?,?,?,?,?)";
 			
 			//set insert variables
 			pst = con.prepareStatement(query);
@@ -104,37 +108,41 @@ public class MySqlConnect {
 			pst.setDate (3, sqlDate);
 			pst.setString   (4, income.getDescription());
 			pst.setBoolean (5, income.getReoccuring());
+			pst.setString(6, user.getPass_word());
 
 			//execute statement
 			pst.executeUpdate();
 
 		}catch(Exception ex){System.out.println("Error: " + ex);}
 		finally{
-			System.out.println("New expense inserted");
+			System.out.println("New income inserted");
 		}		
 	}
 	
-	public void insertExpense(String email, Expense expense){
+	public void insertExpense(User user, Expense expense){
 		java.util.Date utilDate = new java.util.Date();
 	    java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
 		try{
-			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS transactions(email varchar(255), "
-					+ "amount double, date date, description varchar(255), reoccuring boolean)");
+			String email = user.getEmail();
+			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS expenses(email varchar(255), "
+					+ "amount double, date date, description varchar(255), reoccuring boolean, category varchar(255), password varchar(255))");
 			pst.executeUpdate();
 			//removed date
-			String query = "INSERT INTO transactions(email, amount, date, description, reoccuring)"
-					+ "VALUES(?,?,?,?,?)";
+			String query = "INSERT INTO expenses(email, amount, date, description, reoccuring, category, password)"
+					+ "VALUES(?,?,?,?,?,?,?)";
 			pst = con.prepareStatement(query);
 			pst.setString(1,email);
 			pst.setDouble(2,expense.getValue());
 			pst.setDate(3, sqlDate);
 			pst.setString(4, expense.getDescription());
 			pst.setBoolean(5, expense.getReoccuring());
+			pst.setString(6, expense.getCategory().toString());
+			pst.setString(7, user.getPass_word());
 			pst.execute();
 		}catch(Exception ex){
 			System.out.println("Error: " + ex);
 		}finally{
-			System.out.println("new expense inserted");
+			System.out.println("New expense inserted");
 		}
 	}
 	//find if user is in the system
@@ -215,21 +223,31 @@ public class MySqlConnect {
 		return null;
 	}
 	
-	//get list of all transactions from user
-	public ArrayList<Expense> selectExpense(String email) throws Exception{
+	public ArrayList<Expense> selectExpense(User user) throws Exception{
 		ArrayList<Expense> expenseList = new ArrayList<Expense>();
-		Expense expense = new Expense();
 		try{
-			pst = con.prepareStatement("SELECT * FROM transactions WHERE email = ?");
+			String email = user.getEmail();
+			String password = user.getPass_word();
+			pst = con.prepareStatement("SELECT * FROM expenses WHERE email = ? and password = ?");
 			pst.setString(1, email);
+			pst.setString(2, password);
 			rs = pst.executeQuery();
 			
 			while(rs.next() != false){
-				System.out.print(rs.getDate("date").toLocalDate());
+				Expense expense = new Expense();
+				//System.out.print(rs.getDate("date").toLocalDate());
 				expense.setValue(rs.getDouble("amount"));
 				expense.setDate(rs.getDate("date").toLocalDate());
 				expense.setDescription(rs.getString("description"));
 				expense.setReoccuring(rs.getBoolean("reoccuring"));
+				//ExpenseCategory ec = ExpenseCategory.valueOf(rs.getString("category"));
+				if(rs.getString("category").equals("BILL")){expense.setCategory(ExpenseCategory.BILL);}	
+				if(rs.getString("category").equals("RECREATION")){expense.setCategory(ExpenseCategory.RECREATION);}
+				if(rs.getString("category").equals("FOOD")){expense.setCategory(ExpenseCategory.FOOD);}
+				if(rs.getString("category").equals("SAVINGS")){expense.setCategory(ExpenseCategory.SAVINGS);}
+				if(rs.getString("category").equals("MISCELLANEOUS")){expense.setCategory(ExpenseCategory.MISCELLANEOUS);}
+				if(rs.getString("category").equals("HOUSING")){expense.setCategory(ExpenseCategory.HOUSING);}
+				//expense.setCategory(ExpenseCategory.valueOf(rs.getString("category")));
 				expenseList.add(expense);
 			}
 			
@@ -240,24 +258,29 @@ public class MySqlConnect {
 		}
 		return null;
 	}
-	
-	public ArrayList<Income> selectIncome(String email) throws Exception{
+	//get list of all transactions from user
+	public ArrayList<Income> selectIncome(User user) throws Exception{
 		ArrayList<Income> incomeList = new ArrayList<Income>();
-		Income income = new Income();
 		try{
-			pst = con.prepareStatement("SELECT * FROM transactions WHERE email = ?");
+			String email = user.getEmail();
+			String password = user.getPass_word();
+			pst = con.prepareStatement("SELECT * FROM incomes WHERE email = ? and password = ?");
 			pst.setString(1, email);
+			pst.setString(2, password);
 			rs = pst.executeQuery();
 			
 			while(rs.next() != false){
-				System.out.print(rs.getDate("date").toLocalDate());
+				Income income = new Income();
+				//System.out.print(rs.getDate("date").toLocalDate());
 				income.setValue(rs.getDouble("amount"));
 				income.setDate(rs.getDate("date").toLocalDate());
 				income.setDescription(rs.getString("description"));
 				income.setReoccuring(rs.getBoolean("reoccuring"));
 				incomeList.add(income);
 			}
+			
 			return incomeList;
+			
 		}catch(Exception ex){
 			System.out.println("Error: " + ex);
 		}
@@ -286,6 +309,23 @@ public class MySqlConnect {
 			pst.executeUpdate();
 			
 		}catch(Exception ex){System.out.println("Error: " + ex);}	
+	}
+	
+	//delete all transactions
+	public void deleteAllTransactions(String email){
+		try{
+			String query = "DELETE FROM expenses WHERE email = ?";
+			pst = con.prepareStatement(query);
+			pst.setString(1,email);
+			pst.executeUpdate();
+			
+			String query1 = "DELETE FROM incomes WHERE email = ?";
+			pst = con.prepareStatement(query1);
+			pst.setString(1, email);
+			pst.executeUpdate();
+		}catch(Exception ex){
+			System.out.println("Error: " + ex);
+		}
 	}
 	
 	//delete a single income

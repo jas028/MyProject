@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import budgetmanager.model.*;
+import budgetmanager.mysql.MySqlConnect;
 import budgetmanager.util.ExpenseCategory;
 import budgetmanager.view.NavigationLayoutController;
 import javafx.application.Application;
@@ -35,6 +36,7 @@ import javafx.util.Pair;
  */
 public class BudgetManager extends Application {
 	
+	static User user = new User();
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 	private AnchorPane navigationLayout;
@@ -49,7 +51,7 @@ public class BudgetManager extends Application {
 	
 	private ObservableList<Debt> debtData = FXCollections.observableArrayList();
 
-	public BudgetManager() {
+	public BudgetManager() throws Exception {
 		
 		// Email accessed by "emailPassword.getKey()", password accessed by "emailPassword.getValue()"
 		try {
@@ -58,8 +60,11 @@ public class BudgetManager extends Application {
 			Platform.exit();
 		}
 		
+		user.setEmail(emailPassword.getKey());
+		user.setPass_word(emailPassword.getValue());
+		
 		// Sample transaction data.
-		transactionData.add(new Expense(-200.00, (LocalDate.now()), "Camping Trip", false, ExpenseCategory.RECREATION));
+		/*transactionData.add(new Expense(-200.00, (LocalDate.now()), "Camping Trip", false, ExpenseCategory.RECREATION));
 		transactionData.add(new Expense(-100.00, (LocalDate.now()), "Savings Deposit", false, ExpenseCategory.SAVINGS));
 		transactionData.add(new Expense(-120.42, (LocalDate.now()), "Cable Bill", false, ExpenseCategory.BILL));
 		transactionData.add(new Expense(-125.00, (LocalDate.now()), "Groceries", false, ExpenseCategory.FOOD));
@@ -68,7 +73,36 @@ public class BudgetManager extends Application {
 		transactionData.add(new Income(2250.75, (LocalDate.now()), "Paycheck", false, null));
 		transactionData.add(new Income(1264.43, (LocalDate.of(2015, 3, 5)), "Tax Return", false, null));
 		transactionData.add(new Income(367.72, (LocalDate.of(2015, 3, 1)), "Paycheck", true, null));
-		transactionData.add(new Expense(-98.10, (LocalDate.of(2015, 2, 20)), "Electricity", false, ExpenseCategory.BILL));
+		transactionData.add(new Expense(-98.10, (LocalDate.of(2015, 2, 20)), "Electricity", false, ExpenseCategory.BILL));*/
+		
+		MySqlConnect sql = new MySqlConnect();
+		if(!sql.validUser(user.getEmail(), user.getPass_word())){
+			sql.insertUser(user);
+		}
+		ArrayList<Expense> expense;// = new ArrayList<>();
+		ArrayList<Income> income;
+		expense = sql.selectExpense(user);
+		income = sql.selectIncome(user);
+			for(int i = 0; i < expense.size(); i++){
+					transactionData.add(new Expense(expense.get(i).getValue(), 
+							(LocalDate.of(expense.get(i).getDate().getYear(),
+							expense.get(i).getDate().getMonth(),
+							expense.get(i).getDate().getDayOfMonth())),
+							expense.get(i).getDescription(),
+							expense.get(i).getReoccuring(),
+							expense.get(i).getCategory()
+							));
+			}
+			for(int i = 0; i < income.size(); i++){
+					transactionData.add(new Income(income.get(i).getValue(), 
+							(LocalDate.of(income.get(i).getDate().getYear(),
+							income.get(i).getDate().getMonth(),
+							income.get(i).getDate().getDayOfMonth())),
+							income.get(i).getDescription(),
+							income.get(i).getReoccuring(),
+							null
+							));
+				}
 		
 		// Sample debt data
 		debtData.add(new Debt("Car Payment", 1.5, 2000.00, 98.00));
@@ -85,9 +119,21 @@ public class BudgetManager extends Application {
 		initNavigationLayout();
 	}
 	
-	@Override
-	public void stop() {
-		// Insert database saving here
+	public void stop() throws Exception {
+		MySqlConnect sql = new MySqlConnect();
+		Expense expense = new Expense();
+		Income income = new Income();
+		sql.deleteAllTransactions(user.getEmail());
+		for(Transaction transactionData: transactionData){
+			if(transactionData instanceof Expense){
+				expense = (Expense) transactionData;
+				sql.insertExpense(user, expense);
+			}
+			if(transactionData instanceof Income){
+				income = (Income) transactionData;
+				sql.insertIncome(user, income);
+			}
+		}
 	}
 
 	/**
@@ -310,7 +356,7 @@ public class BudgetManager extends Application {
 		return debtData;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		launch(args);
 	}
 }
