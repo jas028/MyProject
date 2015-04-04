@@ -1,41 +1,121 @@
+/**
+ * Class that establishes a connection to the MySQL database on a University of Arkansas
+ * server. A SSH client must be used to connect to the server, so a tunnel connection is
+ * to access the database.
+ * 
+ * Class also contains the methods to make MySQL requests and disconnect from the server
+ * and the database.
+ */
+
+//Packages
 package budgetmanager.mysql;
+
+//Libraries
 import java.sql.*;
-
 import budgetmanager.util.ExpenseCategory;
-
-import java.util.ArrayList;
-
-//import com.mysql.jdbc.Util;
-
 import budgetmanager.model.*;
-import budgetmanager.util.ExpenseCategory;
+import java.util.ArrayList;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+
 
 public class MySqlConnect {
 	
-	private Connection con;
-	private PreparedStatement pst;
-	private ResultSet rs;
+	private Connection con;//sql connection variable
+	private PreparedStatement pst;//sql request variable
+	private ResultSet rs;//database results variable
+	private Session session = null; //SSH session variable
 	
-	public MySqlConnect() throws Exception{	
+	//***********************************************Server Connection*******************************************************
+	
+	//---------------------------------------------------------------------------------------------------------
+	/**
+	 * Constructor to establish a new connection to database using a tunnel to SSH
+	 * @throws JSchException
+	 */
+	public MySqlConnect() throws JSchException{
+		//Information needed to connect to ssh comp.uark.edu
+		String host = "comp.uark.edu";
+		String remote_host = "localhost";
+		int sshPort = 22;
+		String user = "jmhernan";
+		String password = "Tywin0002";
+		
+		//ports needed for portForwarding
+		int local_port = 3306;
+		int remote_port = 3306;
+		
+		//Information needed to connect to MySql on ssh server
+		String dbUserName = "jmhernan";
+		String dbPassword = "Group8";
+		String serverURL = "jdbc:mysql://" + remote_host + ":" + remote_port + "/" + dbUserName;
+		String driverName = "com.mysql.jdbc.Driver";
+		
 		try{
-			//uses jar file to make connection to database;
+			System.out.println("Connecting to " + host + "...");
+			
+			//JSch object to create SSH session
+			JSch jsch = new JSch();
+			
+			//create session to SSH client
+			session = jsch.getSession(user, host, sshPort);
+			
+			//configuration for SSH client
+			java.util.Properties config = new java.util.Properties();
+			config.put("StrictHostKeyChecking", "no");
+			config.put("ConnectionAttempts","3");
+			
+			//set SSH password, configuration
+			session.setPassword(password);
+			session.setConfig(config);
+			
+			//connect to SSH
+			session.connect();
+			System.out.println("Connected to server ssh " + host);
+			
+			//portForwarding
+			System.out.println("Creating Tunnel: Forwarding local port:" + local_port + " to remote port:" + remote_port + "...");
+			int assignedPort = session.setPortForwardingL(local_port, remote_host, remote_port);
+			System.out.println("Tunnel created");
+			
+			//Connect to MySQL database
+			System.out.println("Connecting to " + dbUserName + "@" + remote_host + ":" + assignedPort + "...");
+			Class.forName(driverName);
+			
 			//connect to the server
-			String driver = "com.mysql.jdbc.Driver";
-			String url = "jdbc:mysql://localhost:3306/my_database";
-			String user = "root";
-			String password = "Wrigley1!";
-			Class.forName(driver);
-			//Right now this has no database in it. I've emailed the server admin to figure out why the packet is too big
-			//When I just try to connect with no other information.
-			con = DriverManager.getConnection(url,user,password);
-		//if exception
+			con = DriverManager.getConnection(serverURL, dbUserName, dbPassword);
+			System.out.println("Connected to database " + dbUserName + "@" + remote_host);
+
 		}catch(Exception ex){System.out.println("Error: " + ex);}
-		finally{
-			System.out.println("Connected to database");
-		}
 	}
 	
-	//insert a new user
+	//---------------------------------------------------------------------------------------------------------
+	/**
+	 * Disconnects to the SSH server and MySQL database
+	 * @throws SQLException
+	 */
+	public void MySQLDisconnect() throws SQLException, JSchException{
+		try{
+			//disconnect from SSH
+			if(session.isConnected())
+				session.disconnect();
+			
+			//disconnect from MySQL
+			if(!con.isClosed())
+				con.close();
+			
+		}catch(Exception e){System.out.println("Error: " + e);}
+	}
+	
+	//***********************************************INSERT Requests*********************************************************
+	
+	//---------------------------------------------------------------------------------------------------------
+	/**
+	 * Method to INSERT a new user
+	 * @param user
+	 * @throws Exception
+	 */
 	public void insertUser(User user) throws Exception{
 		try{
 			//set MySql insert statement
@@ -52,14 +132,18 @@ public class MySqlConnect {
 
 			//execute statement
 			pst.executeUpdate();
+			System.out.println("New user inserted");
 			
 		}catch(Exception ex){System.out.println("Error: " + ex);}
-		finally{
-			System.out.println("New user inserted");
-		}
 	}
 	
-	//insert a new loan
+	//---------------------------------------------------------------------------------------------------------
+	/**
+	 * Method to INSERT a Debt
+	 * @param email
+	 * @param debt
+	 * @throws Exception
+	 */
 	public void insertLoan(String email, Debt debt) throws Exception{
 		try{
 			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS loans(email varchar(255), "
@@ -82,17 +166,17 @@ public class MySqlConnect {
 			pst.executeUpdate();
 
 		}catch(Exception ex){System.out.println("Error: " + ex);}
-		finally{
-			System.out.println("New loan inserted");
-		}
 	}
 	
-	//insert a new transaction
+	//---------------------------------------------------------------------------------------------------------
+	/**
+	 * Method to INSERT an Income
+	 * @param user
+	 * @param income
+	 * @throws Exception
+	 */
 	public void insertIncome(User user, Transaction income) throws Exception{
-		java.util.Date utilDate = new java.util.Date();
-	    java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
 		try{
-			String email = user.getEmail();
 			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS incomes(email varchar(255), "
 					+ "amount double, date date, description varchar(255), reoccuring boolean, password varchar(255))");
 			//create new table if it doesn't exist
@@ -103,9 +187,9 @@ public class MySqlConnect {
 			
 			//set insert variables
 			pst = con.prepareStatement(query);
-			pst.setString (1, email);
+			pst.setString (1, user.getEmail());
 			pst.setDouble (2, income.getValue());
-			pst.setDate (3, sqlDate);
+			pst.setDate (3, Date.valueOf(income.getDate()));
 			pst.setString   (4, income.getDescription());
 			pst.setBoolean (5, income.getReoccuring());
 			pst.setString(6, user.getPass_word());
@@ -113,39 +197,49 @@ public class MySqlConnect {
 			//execute statement
 			pst.executeUpdate();
 
-		}catch(Exception ex){System.out.println("Error: " + ex);}
-		finally{
-			System.out.println("New income inserted");
-		}		
+		}catch(Exception ex){System.out.println("Error: " + ex);}	
 	}
 	
+	//---------------------------------------------------------------------------------------------------------
+	/**
+	 * Method to INSERT a new Expense
+	 * @param user
+	 * @param expense
+	 */
 	public void insertExpense(User user, Expense expense){
-		java.util.Date utilDate = new java.util.Date();
-	    java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
 		try{
-			String email = user.getEmail();
-			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS expenses(email varchar(255), "
-					+ "amount double, date date, description varchar(255), reoccuring boolean, category varchar(255), password varchar(255))");
+			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS "
+					+ "expenses(email varchar(255), "
+					+ "amount double, date date, description varchar(255), "
+					+ "reoccuring boolean, category varchar(255), password varchar(255))");
 			pst.executeUpdate();
+			
 			//removed date
-			String query = "INSERT INTO expenses(email, amount, date, description, reoccuring, category, password)"
+			String query = "INSERT INTO expenses(email, amount, date, "
+					+ "description, reoccuring, category, password)"
 					+ "VALUES(?,?,?,?,?,?,?)";
 			pst = con.prepareStatement(query);
-			pst.setString(1,email);
+			pst.setString(1,user.getEmail());
 			pst.setDouble(2,expense.getValue());
-			pst.setDate(3, sqlDate);
+			pst.setDate(3, Date.valueOf(expense.getDate()));
 			pst.setString(4, expense.getDescription());
 			pst.setBoolean(5, expense.getReoccuring());
 			pst.setString(6, expense.getCategory().toString());
 			pst.setString(7, user.getPass_word());
 			pst.execute();
-		}catch(Exception ex){
-			System.out.println("Error: " + ex);
-		}finally{
-			System.out.println("New expense inserted");
-		}
+			
+		}catch(Exception ex){System.out.println("Error: " + ex);}
 	}
-	//find if user is in the system
+	
+	//***********************************************SELECT Requests*********************************************************
+	//---------------------------------------------------------------------------------------------------------
+	/**
+	 * Method to check if a user exists. Returns Boolean
+	 * @param email
+	 * @param pass_word
+	 * @return
+	 * @throws Exception
+	 */
 	public Boolean validUser(String email, String pass_word) throws Exception{
 		try{
 			//MySql select statement
@@ -160,15 +254,23 @@ public class MySqlConnect {
 			rs = pst.executeQuery();
 			
 			//find is there is a match
-			if(rs.next())
+			if(rs.next()){
+				System.out.println("Valid user");
 				return true;
-			
+			}
 		}catch(Exception ex){System.out.println("Error: " + ex);}
-			return false;
-	}
-
+		System.out.println("User does not exist");
+		return false;
+	}	
 	
-	//get all info for a user
+	//---------------------------------------------------------------------------------------------------------
+	/**
+	 * Method to get User email and Password.Returns User.
+	 * @param email
+	 * @param pass_word
+	 * @return
+	 * @throws Exception
+	 */
 	public User selectUser(String email, String pass_word) throws Exception{
 		User user = new User();
 		try{
@@ -196,139 +298,206 @@ public class MySqlConnect {
 			//If email or password are incorrect user is informed
 			System.out.print("invalid username and/or password");
 			return null;
-		}catch(SQLException ex){
-			System.out.println(ex);
-			return null;
-		}
+		}catch(SQLException ex){System.out.println(ex);}
+		return null;
 	}
 	
-	//get list of all debts from user
-	public ArrayList<Debt> selectLoan(String email) throws Exception{
+	//---------------------------------------------------------------------------------------------------------
+	/**
+	 * Method to get all Debts from user. Returns ArrayList of user Debt
+	 * @param email
+	 * @return
+	 * @throws Exception
+	 */
+	public ArrayList<Debt> selectLoan(User user) throws Exception{
+		//Create Debt ArrayList
 		ArrayList<Debt> debtList = new ArrayList<Debt>();
-		Debt debt = new Debt();
+		
+		//MySql request to select all Debts from User
 		try{
 			pst = con.prepareStatement("SELECT * FROM loans WHERE email = ?");
-			pst.setString(1, email);
+			pst.setString(1, user.getEmail());
 			rs = pst.executeQuery();
 			
+			//Loop through all the information pulled and insert fields into the object
 			while(rs.next() != false){
+				Debt debt = new Debt();
 				debt.setName(rs.getString("name"));
 				debt.setBalance(rs.getDouble("balance"));
 				debt.setRate(rs.getDouble("rate"));
 				debt.setPayment(rs.getDouble("payment"));
+				
+				//push Debt object to Debt ArrayList
 				debtList.add(debt);
 			}
+			//return List
 			return debtList;
+			
 		}catch(Exception ex){System.out.println("Error: " + ex);}
 		return null;
 	}
 	
+	//---------------------------------------------------------------------------------------------------------
+	/**
+	 * Method to get all Expenses from user. Returns ArrayList of Expenses
+	 * @param user
+	 * @return
+	 * @throws Exception
+	 */
 	public ArrayList<Expense> selectExpense(User user) throws Exception{
+		
+		//Create return object
 		ArrayList<Expense> expenseList = new ArrayList<Expense>();
+		
+		//MySQL request to select all Expenses from User
 		try{
-			String email = user.getEmail();
-			String password = user.getPass_word();
 			pst = con.prepareStatement("SELECT * FROM expenses WHERE email = ? and password = ?");
-			pst.setString(1, email);
-			pst.setString(2, password);
+			pst.setString(1, user.getEmail());
+			pst.setString(2, user.getPass_word());
 			rs = pst.executeQuery();
 			
+			//Loop through all pulled information and add fields to objects
 			while(rs.next() != false){
 				Expense expense = new Expense();
-				//System.out.print(rs.getDate("date").toLocalDate());
 				expense.setValue(rs.getDouble("amount"));
 				expense.setDate(rs.getDate("date").toLocalDate());
 				expense.setDescription(rs.getString("description"));
 				expense.setReoccuring(rs.getBoolean("reoccuring"));
-				//ExpenseCategory ec = ExpenseCategory.valueOf(rs.getString("category"));
+				
+				//Get the ExpenseCategory
 				if(rs.getString("category").equals("BILL")){expense.setCategory(ExpenseCategory.BILL);}	
 				if(rs.getString("category").equals("RECREATION")){expense.setCategory(ExpenseCategory.RECREATION);}
 				if(rs.getString("category").equals("FOOD")){expense.setCategory(ExpenseCategory.FOOD);}
 				if(rs.getString("category").equals("SAVINGS")){expense.setCategory(ExpenseCategory.SAVINGS);}
 				if(rs.getString("category").equals("MISCELLANEOUS")){expense.setCategory(ExpenseCategory.MISCELLANEOUS);}
 				if(rs.getString("category").equals("HOUSING")){expense.setCategory(ExpenseCategory.HOUSING);}
-				//expense.setCategory(ExpenseCategory.valueOf(rs.getString("category")));
+				
+				//Push Expense to Expense ArrayList
 				expenseList.add(expense);
 			}
 			
+			//Return ArrayList
 			return expenseList;
 			
-		}catch(Exception ex){
-			System.out.println("Error: " + ex);
-		}
+		}catch(Exception ex){System.out.println("Error: " + ex);}
 		return null;
 	}
-	//get list of all transactions from user
+	
+	//---------------------------------------------------------------------------------------------------------
+	/**
+	 * Method to get all Incomes from user. Returns ArrayList of Incomes
+	 * @param user
+	 * @return
+	 * @throws Exception
+	 */
 	public ArrayList<Income> selectIncome(User user) throws Exception{
+		
+		//Create Income ArrayList
 		ArrayList<Income> incomeList = new ArrayList<Income>();
+		
+		//MySQL request to select all Incomes from User
 		try{
-			String email = user.getEmail();
-			String password = user.getPass_word();
 			pst = con.prepareStatement("SELECT * FROM incomes WHERE email = ? and password = ?");
-			pst.setString(1, email);
-			pst.setString(2, password);
+			pst.setString(1, user.getEmail());
+			pst.setString(2, user.getPass_word());
 			rs = pst.executeQuery();
 			
+			//loop through all information pulled and add fields to object
 			while(rs.next() != false){
 				Income income = new Income();
-				//System.out.print(rs.getDate("date").toLocalDate());
 				income.setValue(rs.getDouble("amount"));
 				income.setDate(rs.getDate("date").toLocalDate());
 				income.setDescription(rs.getString("description"));
 				income.setReoccuring(rs.getBoolean("reoccuring"));
+				
+				//Push income to Income ArrayList
 				incomeList.add(income);
 			}
 			
+			//Return Income ArrayList
 			return incomeList;
 			
-		}catch(Exception ex){
-			System.out.println("Error: " + ex);
-		}
+		}catch(Exception ex){System.out.println("Error: " + ex);}
 		return null;
 	}
 	
-	//delete a user and all its information
-	public void deleteUser(String email) throws Exception{
+	//***********************************************DELETE Requests**********************************************************
+	
+	//---------------------------------------------------------------------------------------------------------
+	/**
+	 * Method to delete all User information from database, User, Expense and Income.
+	 * @param email
+	 * @throws Exception
+	 */
+	public void deleteUser(User user) throws Exception{
 		try{
-			String query = "DELETE FROM users WHERE email = ?";
-			pst = con.prepareStatement(query);
-			pst.setString(1, email);
+			//variable to hole request
+			String query;
 			
+			//MySQL request to DELETE User from user table
+			query = "DELETE FROM users WHERE email = ?";
+			pst = con.prepareStatement(query);
+			pst.setString(1, user.getEmail());
 			pst.executeUpdate();
 			
-			query = "DELETE FROM transactions WHERE user_name = ?";
+			//MySQL request to Delete User from expenses table
+			query = "DELETE FROM expenses WHERE email = ?";
 			pst = con.prepareStatement(query);
-			pst.setString(1, email);
-			
+			pst.setString(1, user.getEmail());
 			pst.executeUpdate();
 			
-			query = "DELETE FROM loans WHERE user_name = ?";
+			//MySQL request to DELETE USER from incomes table
+			query = "DELETE FROM incomes WHERE email = ?";
 			pst = con.prepareStatement(query);
-			pst.setString(1, email);
+			pst.setString(1, user.getEmail());
+			pst.executeUpdate();
 			
+			//MySQL request to DELETE USER from incomes table
+			query = "DELETE FROM debts WHERE email = ?";
+			pst = con.prepareStatement(query);
+			pst.setString(1, user.getEmail());
 			pst.executeUpdate();
 			
 		}catch(Exception ex){System.out.println("Error: " + ex);}	
 	}
 	
-	//delete all transactions
-	public void deleteAllTransactions(String email){
+	//---------------------------------------------------------------------------------------------------------
+	/**
+	 * Method to delete all User transaction, Expenses and Incomes
+	 * @param email
+	 */
+	public void deleteAllTransactions(User user){
+		//Variable to hold request
+		String query;
+		
+		//Clear expenses, incomes and debts from database
 		try{
-			String query = "DELETE FROM expenses WHERE email = ?";
+			//MySQL request to DELETE expenses
+			query = "DELETE FROM expenses WHERE email = ?";
 			pst = con.prepareStatement(query);
-			pst.setString(1,email);
+			pst.setString(1, user.getEmail());
 			pst.executeUpdate();
 			
-			String query1 = "DELETE FROM incomes WHERE email = ?";
-			pst = con.prepareStatement(query1);
-			pst.setString(1, email);
+			//MySQL request to DELETE incomes
+			query = "DELETE FROM incomes WHERE email = ?";
+			pst = con.prepareStatement(query);
+			pst.setString(1, user.getEmail());
 			pst.executeUpdate();
+			
+			//MySQL request to DELETE debts
+			query = "DELETE FROM debts WHERE email = ?";
+			pst = con.prepareStatement(query);
+			pst.setString(1, user.getEmail());
+			pst.executeUpdate();
+			
 		}catch(Exception ex){
 			System.out.println("Error: " + ex);
 		}
 	}
 	
-	//delete a single income
+	//************************************************Helper Functions********************************************************
+	
+	/*//delete a single income
 	public void deleteIncome(String email, Income income) throws Exception{
 		java.util.Date utilDate = new java.util.Date();
 	    java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
@@ -402,5 +571,6 @@ public class MySqlConnect {
 		}catch(Exception ex){System.out.println("Error: " + ex);}
 		
 		return false;
-	}
+	}*/
+	
 }

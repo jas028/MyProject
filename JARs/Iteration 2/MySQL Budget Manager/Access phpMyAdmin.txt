@@ -1,0 +1,9 @@
+To access the databse using the phpMyAdmin User Interface
+
+Go to website
+http://comp.uark.edu/phpMyAdmin/
+
+Username: jmhernan
+Password: Group8
+
+click on the jmhernan database on the left

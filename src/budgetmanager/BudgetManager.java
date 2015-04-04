@@ -37,6 +37,7 @@ import javafx.util.Pair;
 public class BudgetManager extends Application {
 	
 	static User user = new User();
+	private MySqlConnect sql;
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 	private AnchorPane navigationLayout;
@@ -63,6 +64,43 @@ public class BudgetManager extends Application {
 		user.setEmail(emailPassword.getKey());
 		user.setPass_word(emailPassword.getValue());
 		
+		sql = new MySqlConnect();
+		
+		if(!sql.validUser(user.getEmail(), user.getPass_word())){
+			sql.insertUser(user);
+		}
+		ArrayList<Expense> expense;// = new ArrayList<>();
+		ArrayList<Income> income;
+		expense = sql.selectExpense(user);
+		income = sql.selectIncome(user);
+		
+		if(expense != null)
+			for(int i = 0; i < expense.size(); i++){
+				transactionData.add(new Expense(expense.get(i).getValue(), 
+						(LocalDate.of(expense.get(i).getDate().getYear(),
+								expense.get(i).getDate().getMonth(),
+								expense.get(i).getDate().getDayOfMonth())),
+								expense.get(i).getDescription(),
+								expense.get(i).getReoccuring(),
+								expense.get(i).getCategory()
+						));
+			}
+		
+		if(income != null)
+			for(int i = 0; i < income.size(); i++){
+				transactionData.add(new Income(income.get(i).getValue(), 
+						(LocalDate.of(income.get(i).getDate().getYear(),
+								income.get(i).getDate().getMonth(),
+								income.get(i).getDate().getDayOfMonth())),
+								income.get(i).getDescription(),
+								income.get(i).getReoccuring(),
+								null
+						));
+			}
+		
+		sql.MySQLDisconnect();
+			
+
 		// Sample transaction data.
 		/*transactionData.add(new Expense(-200.00, (LocalDate.now()), "Camping Trip", false, ExpenseCategory.RECREATION));
 		transactionData.add(new Expense(-100.00, (LocalDate.now()), "Savings Deposit", false, ExpenseCategory.SAVINGS));
@@ -75,39 +113,11 @@ public class BudgetManager extends Application {
 		transactionData.add(new Income(367.72, (LocalDate.of(2015, 3, 1)), "Paycheck", true, null));
 		transactionData.add(new Expense(-98.10, (LocalDate.of(2015, 2, 20)), "Electricity", false, ExpenseCategory.BILL));*/
 		
-		MySqlConnect sql = new MySqlConnect();
-		if(!sql.validUser(user.getEmail(), user.getPass_word())){
-			sql.insertUser(user);
-		}
-		ArrayList<Expense> expense;// = new ArrayList<>();
-		ArrayList<Income> income;
-		expense = sql.selectExpense(user);
-		income = sql.selectIncome(user);
-			for(int i = 0; i < expense.size(); i++){
-					transactionData.add(new Expense(expense.get(i).getValue(), 
-							(LocalDate.of(expense.get(i).getDate().getYear(),
-							expense.get(i).getDate().getMonth(),
-							expense.get(i).getDate().getDayOfMonth())),
-							expense.get(i).getDescription(),
-							expense.get(i).getReoccuring(),
-							expense.get(i).getCategory()
-							));
-			}
-			for(int i = 0; i < income.size(); i++){
-					transactionData.add(new Income(income.get(i).getValue(), 
-							(LocalDate.of(income.get(i).getDate().getYear(),
-							income.get(i).getDate().getMonth(),
-							income.get(i).getDate().getDayOfMonth())),
-							income.get(i).getDescription(),
-							income.get(i).getReoccuring(),
-							null
-							));
-				}
-		
 		// Sample debt data
-		debtData.add(new Debt("Car Payment", 1.5, 2000.00, 98.00));
-		debtData.add(new Debt("Student Loan", 1.25, 32000.00, 350.00));
+		//debtData.add(new Debt("Car Payment", 1.5, 2000.00, 98.00));
+		//debtData.add(new Debt("Student Loan", 1.25, 32000.00, 350.00));
 	}
+	
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -120,10 +130,10 @@ public class BudgetManager extends Application {
 	}
 	
 	public void stop() throws Exception {
-		MySqlConnect sql = new MySqlConnect();
+		sql = new MySqlConnect();
 		Expense expense = new Expense();
 		Income income = new Income();
-		sql.deleteAllTransactions(user.getEmail());
+		sql.deleteAllTransactions(user);
 		for(Transaction transactionData: transactionData){
 			if(transactionData instanceof Expense){
 				expense = (Expense) transactionData;
@@ -134,6 +144,8 @@ public class BudgetManager extends Application {
 				sql.insertIncome(user, income);
 			}
 		}
+		sql.MySQLDisconnect();
+		
 	}
 
 	/**
