@@ -54,26 +54,39 @@ public class BudgetManager extends Application {
 
 	public BudgetManager() throws Exception {
 		
-		// Email accessed by "emailPassword.getKey()", password accessed by "emailPassword.getValue()"
+		//Email accessed by "emailPassword.getKey()", password accessed by "emailPassword.getValue()"
 		try {
 			emailPassword = loginDialog();
 		} catch (Exception e) {
 			Platform.exit();
 		}
 		
+		//Insert user input into User object
 		user.setEmail(emailPassword.getKey());
 		user.setPass_word(emailPassword.getValue());
 		
+		//Establish connection to database
 		sql = new MySqlConnect();
 		
+		//Verify if User exists
 		if(!sql.validUser(user.getEmail(), user.getPass_word())){
+			//Create new user
 			sql.insertUser(user);
 		}
-		ArrayList<Expense> expense;// = new ArrayList<>();
+		
+		//ArrayList to hold all data from database
+		ArrayList<Expense> expense;
 		ArrayList<Income> income;
+		ArrayList<Debt> debt;
+		
+		//get all information from database
 		expense = sql.selectExpense(user);
 		income = sql.selectIncome(user);
+		debt = sql.selectDebt(user);
 		
+		System.out.println("Gathering data for User: " + user.getEmail() + "...");
+		
+		//Put all expenses into transactionData
 		if(expense != null)
 			for(int i = 0; i < expense.size(); i++){
 				transactionData.add(new Expense(expense.get(i).getValue(), 
@@ -86,6 +99,7 @@ public class BudgetManager extends Application {
 						));
 			}
 		
+		//Put all income into transactionData
 		if(income != null)
 			for(int i = 0; i < income.size(); i++){
 				transactionData.add(new Income(income.get(i).getValue(), 
@@ -98,26 +112,16 @@ public class BudgetManager extends Application {
 						));
 			}
 		
-		sql.MySQLDisconnect();
-			
-
-		// Sample transaction data.
-		/*transactionData.add(new Expense(-200.00, (LocalDate.now()), "Camping Trip", false, ExpenseCategory.RECREATION));
-		transactionData.add(new Expense(-100.00, (LocalDate.now()), "Savings Deposit", false, ExpenseCategory.SAVINGS));
-		transactionData.add(new Expense(-120.42, (LocalDate.now()), "Cable Bill", false, ExpenseCategory.BILL));
-		transactionData.add(new Expense(-125.00, (LocalDate.now()), "Groceries", false, ExpenseCategory.FOOD));
-		transactionData.add(new Expense(-779.51, (LocalDate.now()), "New Laptop", false, ExpenseCategory.MISCELLANEOUS));
-		transactionData.add(new Expense(-650.00, (LocalDate.now()), "Rent", true, ExpenseCategory.HOUSING));
-		transactionData.add(new Income(2250.75, (LocalDate.now()), "Paycheck", false, null));
-		transactionData.add(new Income(1264.43, (LocalDate.of(2015, 3, 5)), "Tax Return", false, null));
-		transactionData.add(new Income(367.72, (LocalDate.of(2015, 3, 1)), "Paycheck", true, null));
-		transactionData.add(new Expense(-98.10, (LocalDate.of(2015, 2, 20)), "Electricity", false, ExpenseCategory.BILL));*/
+		//Put all debts into debtData
+		if(debt != null)
+			for(int i = 0; i < debt.size(); i++){
+				debtData.add(new Debt(debt.get(i).getName(), debt.get(i).getRate(),
+						debt.get(i).getBalance(), debt.get(i).getPayment()));
+			}
 		
-		// Sample debt data
-		//debtData.add(new Debt("Car Payment", 1.5, 2000.00, 98.00));
-		//debtData.add(new Debt("Student Loan", 1.25, 32000.00, 350.00));
+		//close connection to the database
+		sql.MySQLDisconnect();
 	}
-	
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -130,22 +134,32 @@ public class BudgetManager extends Application {
 	}
 	
 	public void stop() throws Exception {
+		//Connect to database
 		sql = new MySqlConnect();
-		Expense expense = new Expense();
-		Income income = new Income();
+		
+		//Clear all old entries from the database related to User
 		sql.deleteAllTransactions(user);
+		sql.deleteAllDebts(user);
+		
+		//Get all new updates entries from the User and copy to the database
+		System.out.println("Copying data to the database...");
 		for(Transaction transactionData: transactionData){
 			if(transactionData instanceof Expense){
-				expense = (Expense) transactionData;
-				sql.insertExpense(user, expense);
+				sql.insertExpense(user, (Expense) transactionData);
 			}
+			
 			if(transactionData instanceof Income){
-				income = (Income) transactionData;
-				sql.insertIncome(user, income);
+
+				sql.insertIncome(user, (Income) transactionData);
 			}
 		}
-		sql.MySQLDisconnect();
 		
+		for(Debt debtData: debtData){
+			sql.insertDebt(user, debtData);
+		}
+		
+		//disconnect from the database
+		sql.MySQLDisconnect();
 	}
 
 	/**

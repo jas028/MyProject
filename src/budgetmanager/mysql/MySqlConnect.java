@@ -98,12 +98,16 @@ public class MySqlConnect {
 	public void MySQLDisconnect() throws SQLException, JSchException{
 		try{
 			//disconnect from SSH
-			if(session.isConnected())
+			if(session.isConnected()){
 				session.disconnect();
+				System.out.println("Disconnected form SSH client");
+			}
 			
 			//disconnect from MySQL
-			if(!con.isClosed())
+			if(!con.isClosed()){
 				con.close();
+				System.out.println("Disconnected from database");
+			}
 			
 		}catch(Exception e){System.out.println("Error: " + e);}
 	}
@@ -144,23 +148,24 @@ public class MySqlConnect {
 	 * @param debt
 	 * @throws Exception
 	 */
-	public void insertLoan(String email, Debt debt) throws Exception{
+	public void insertDebt(User user, Debt debt) throws Exception{
 		try{
-			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS loans(email varchar(255), "
-					+ "name varchar(255), balance double, rate double, payment double)");
+			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS debts(email varchar(255), "
+					+ "name varchar(255), balance double, rate double, payment double, password varchar(255))");
 			//set MySql insert statement
 			pst.executeUpdate();
 			
-			String query = "INSERT INTO loans(email, name, balance, rate, payment)"
-					+ " VALUES(?, ?, ?, ?, ?)";
+			String query = "INSERT INTO debts(email, name, balance, rate, payment, password)"
+					+ " VALUES(?, ?, ?, ?, ?, ?)";
 			
 			//set insert variables
 			pst = con.prepareStatement(query);
-			pst.setString (1, email);
+			pst.setString (1, user.getEmail());
 			pst.setString (2, debt.getName());
 			pst.setDouble (3, debt.getBalance());
 			pst.setDouble (4, debt.getRate());
 			pst.setDouble (5, debt.getPayment());
+			pst.setString (6, user.getPass_word());
 
 			//execute statement
 			pst.executeUpdate();
@@ -189,10 +194,10 @@ public class MySqlConnect {
 			pst = con.prepareStatement(query);
 			pst.setString (1, user.getEmail());
 			pst.setDouble (2, income.getValue());
-			pst.setDate (3, Date.valueOf(income.getDate()));
-			pst.setString   (4, income.getDescription());
-			pst.setBoolean (5, income.getReoccuring());
-			pst.setString(6, user.getPass_word());
+			pst.setDate   (3, Date.valueOf(income.getDate()));
+			pst.setString (4, income.getDescription());
+			pst.setBoolean(5, income.getReoccuring());
+			pst.setString (6, user.getPass_word());
 
 			//execute statement
 			pst.executeUpdate();
@@ -309,14 +314,15 @@ public class MySqlConnect {
 	 * @return
 	 * @throws Exception
 	 */
-	public ArrayList<Debt> selectLoan(User user) throws Exception{
+	public ArrayList<Debt> selectDebt(User user) throws Exception{
 		//Create Debt ArrayList
 		ArrayList<Debt> debtList = new ArrayList<Debt>();
 		
 		//MySql request to select all Debts from User
 		try{
-			pst = con.prepareStatement("SELECT * FROM loans WHERE email = ?");
+			pst = con.prepareStatement("SELECT * FROM debts WHERE email = ? AND password = ?");
 			pst.setString(1, user.getEmail());
+			pst.setString(2, user.getPass_word());
 			rs = pst.executeQuery();
 			
 			//Loop through all the information pulled and insert fields into the object
@@ -425,7 +431,7 @@ public class MySqlConnect {
 	
 	//---------------------------------------------------------------------------------------------------------
 	/**
-	 * Method to delete all User information from database, User, Expense and Income.
+	 * Method to delete all User information from database, User, Expense, Income, Debts.
 	 * @param email
 	 * @throws Exception
 	 */
@@ -435,27 +441,31 @@ public class MySqlConnect {
 			String query;
 			
 			//MySQL request to DELETE User from user table
-			query = "DELETE FROM users WHERE email = ?";
+			query = "DELETE FROM users WHERE email = ? AND password = ?";
 			pst = con.prepareStatement(query);
 			pst.setString(1, user.getEmail());
+			pst.setString(2, user.getPass_word());
 			pst.executeUpdate();
 			
 			//MySQL request to Delete User from expenses table
-			query = "DELETE FROM expenses WHERE email = ?";
+			query = "DELETE FROM expenses WHERE email = ? And password = ?";
 			pst = con.prepareStatement(query);
 			pst.setString(1, user.getEmail());
+			pst.setString(2, user.getPass_word());
 			pst.executeUpdate();
 			
 			//MySQL request to DELETE USER from incomes table
-			query = "DELETE FROM incomes WHERE email = ?";
+			query = "DELETE FROM incomes WHERE email = ? And password = ?";
 			pst = con.prepareStatement(query);
 			pst.setString(1, user.getEmail());
+			pst.setString(2, user.getPass_word());
 			pst.executeUpdate();
 			
 			//MySQL request to DELETE USER from incomes table
-			query = "DELETE FROM debts WHERE email = ?";
+			query = "DELETE FROM debts WHERE email = ? AND password = ?";
 			pst = con.prepareStatement(query);
 			pst.setString(1, user.getEmail());
+			pst.setString(2, user.getPass_word());
 			pst.executeUpdate();
 			
 		}catch(Exception ex){System.out.println("Error: " + ex);}	
@@ -463,14 +473,14 @@ public class MySqlConnect {
 	
 	//---------------------------------------------------------------------------------------------------------
 	/**
-	 * Method to delete all User transaction, Expenses and Incomes
+	 * Method to delete all User Expenses and Incomes
 	 * @param email
 	 */
 	public void deleteAllTransactions(User user){
 		//Variable to hold request
 		String query;
 		
-		//Clear expenses, incomes and debts from database
+		//Clear expenses and incomes from database
 		try{
 			//MySQL request to DELETE expenses
 			query = "DELETE FROM expenses WHERE email = ?";
@@ -484,15 +494,27 @@ public class MySqlConnect {
 			pst.setString(1, user.getEmail());
 			pst.executeUpdate();
 			
+		}catch(Exception ex){System.out.println("Error: " + ex);}
+	}
+	
+	//---------------------------------------------------------------------------------------------------------
+	/**
+	 * Method to delete all User Debts
+	 * @param user
+	 */
+	public void deleteAllDebts(User user){
+		//Variable to hold request
+		String query;
+		
+		//Clear debts from database
+		try{
 			//MySQL request to DELETE debts
 			query = "DELETE FROM debts WHERE email = ?";
 			pst = con.prepareStatement(query);
 			pst.setString(1, user.getEmail());
 			pst.executeUpdate();
 			
-		}catch(Exception ex){
-			System.out.println("Error: " + ex);
-		}
+		}catch(Exception ex){System.out.println("Error: " + ex);}
 	}
 	
 	//************************************************Helper Functions********************************************************
