@@ -54,11 +54,12 @@ public class BudgetManager extends Application {
 
 	public BudgetManager() throws Exception {
 		
-		//Email accessed by "emailPassword.getKey()", password accessed by "emailPassword.getValue()"
+		// Email accessed by "emailPassword.getKey()", password accessed by "emailPassword.getValue()"
 		try {
 			emailPassword = loginDialog();
 		} catch (Exception e) {
 			Platform.exit();
+			System.exit(0);
 		}
 		
 		//Insert user input into User object
@@ -134,32 +135,30 @@ public class BudgetManager extends Application {
 	}
 	
 	public void stop() throws Exception {
-		//Connect to database
-		sql = new MySqlConnect();
-		
-		//Clear all old entries from the database related to User
-		sql.deleteAllTransactions(user);
-		sql.deleteAllDebts(user);
-		
-		//Get all new updates entries from the User and copy to the database
-		System.out.println("Copying data to the database...");
-		for(Transaction transactionData: transactionData){
-			if(transactionData instanceof Expense){
-				sql.insertExpense(user, (Expense) transactionData);
-			}
-			
-			if(transactionData instanceof Income){
+		if (emailPassword != null) {
+			//Connect to database
+			sql = new MySqlConnect();
+			//Clear all old entries from the database related to User
+			sql.deleteAllTransactions(user);
+			sql.deleteAllDebts(user);
+			//Get all new updates entries from the User and copy to the database
+			System.out.println("Copying data to the database...");
+			for (Transaction transactionData : transactionData) {
+				if (transactionData instanceof Expense) {
+					sql.insertExpense(user, (Expense) transactionData);
+				}
 
-				sql.insertIncome(user, (Income) transactionData);
+				if (transactionData instanceof Income) {
+
+					sql.insertIncome(user, (Income) transactionData);
+				}
 			}
+			for (Debt debtData : debtData) {
+				sql.insertDebt(user, debtData);
+			}
+			//disconnect from the database
+			sql.MySQLDisconnect();
 		}
-		
-		for(Debt debtData: debtData){
-			sql.insertDebt(user, debtData);
-		}
-		
-		//disconnect from the database
-		sql.MySQLDisconnect();
 	}
 
 	/**
@@ -235,7 +234,7 @@ public class BudgetManager extends Application {
 		Node loginButton = loginDialog.getDialogPane().lookupButton(loginButtonType);
 		loginButton.setDisable(true);
 
-		// Do some validation (using the Java 8 lambda syntax).
+		// Input validation
 		email.textProperty().addListener((observable, oldValue, newValue) -> {
 		    loginButton.setDisable(newValue.trim().isEmpty());
 		});
@@ -254,6 +253,8 @@ public class BudgetManager extends Application {
 		});
 
 		Optional<Pair<String, String>> result = loginDialog.showAndWait();
+		
+		if(result.get().getKey().equals("")) { return null; }
 		
 		return result.get();
 	}
