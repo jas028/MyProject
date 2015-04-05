@@ -99,6 +99,21 @@ public class TransactionEditDialogController extends Stage implements Initializa
 					if(value > 0) {
 						value = 0-value;
 					}
+					
+					// Edit selected Expense
+					if(categoryChoice.getValue().matches("Housing")) {
+						((Expense) this.selectedTransaction).setCategory(ExpenseCategory.HOUSING);
+					} else if(categoryChoice.getValue().matches("Bill")) {
+						((Expense) this.selectedTransaction).setCategory(ExpenseCategory.BILL);
+					} else if(categoryChoice.getValue().matches("Recreation")) {
+						((Expense) this.selectedTransaction).setCategory(ExpenseCategory.RECREATION);
+					} else if(categoryChoice.getValue().matches("Savings")) {
+						((Expense) this.selectedTransaction).setCategory(ExpenseCategory.SAVINGS);
+					} else if(categoryChoice.getValue().matches("Food")) {
+						((Expense) this.selectedTransaction).setCategory(ExpenseCategory.FOOD);
+					} else if(categoryChoice.getValue().matches("Miscellaneous")) {
+						((Expense) this.selectedTransaction).setCategory(ExpenseCategory.MISCELLANEOUS);
+					}
 				}
 				else {
 					if(typeChoice.getValue().matches("Expense")) {
@@ -161,6 +176,21 @@ public class TransactionEditDialogController extends Stage implements Initializa
 	public void initFields() {
 		if(selectedTransaction instanceof Expense) {
 			typeChoice.getSelectionModel().selectFirst();
+			handleTypeSelect();
+			
+			if(((Expense) this.selectedTransaction).getCategory() == ExpenseCategory.HOUSING) {
+				categoryChoice.getSelectionModel().select("Housing");
+			} else if(((Expense) this.selectedTransaction).getCategory() == ExpenseCategory.BILL) {
+				categoryChoice.getSelectionModel().select("Bill");
+			} else if(((Expense) this.selectedTransaction).getCategory() == ExpenseCategory.RECREATION) {
+				categoryChoice.getSelectionModel().select("Recreation");
+			} else if(((Expense) this.selectedTransaction).getCategory() == ExpenseCategory.FOOD) {
+				categoryChoice.getSelectionModel().select("Food");
+			} else if(((Expense) this.selectedTransaction).getCategory() == ExpenseCategory.SAVINGS) {
+				categoryChoice.getSelectionModel().select("Savings");
+			} else if(((Expense) this.selectedTransaction).getCategory() == ExpenseCategory.MISCELLANEOUS) {
+				categoryChoice.getSelectionModel().select("Miscellaneous");
+			}
 		}
 		else if(selectedTransaction instanceof Income) {
 			typeChoice.getSelectionModel().selectLast();
