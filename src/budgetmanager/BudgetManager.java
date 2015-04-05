@@ -54,6 +54,9 @@ public class BudgetManager extends Application {
 
 	public BudgetManager() throws Exception {
 		
+		//Establish connection to database
+		sql = new MySqlConnect();
+		
 		// Email accessed by "emailPassword.getKey()", password accessed by "emailPassword.getValue()"
 		try {
 			emailPassword = loginDialog();
@@ -66,13 +69,23 @@ public class BudgetManager extends Application {
 		user.setEmail(emailPassword.getKey());
 		user.setPass_word(emailPassword.getValue());
 		
-		//Establish connection to database
-		sql = new MySqlConnect();
-		
 		//Verify if User exists
-		if(!sql.validUser(user.getEmail(), user.getPass_word())){
+		while(!sql.validUser(user.getEmail(), user.getPass_word())){
 			//Create new user
-			sql.insertUser(user);
+			if(!sql.available(user.getEmail())){
+				try {
+					emailPassword = loginDialog();
+				} catch (Exception e) {
+					Platform.exit();
+					System.exit(0);
+				}
+				
+				//Insert user input into User object
+				user.setEmail(emailPassword.getKey());
+				user.setPass_word(emailPassword.getValue());
+			}else{
+				sql.insertUser(user);
+			}
 		}
 		
 		//ArrayList to hold all data from database

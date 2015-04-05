@@ -245,6 +245,21 @@ public class MySqlConnect {
 	 * @return
 	 * @throws Exception
 	 */
+	
+	public Boolean available(String email) throws Exception{
+		try{
+			String query = "SELECT * FROM users WHERE email = ?";
+			pst = con.prepareStatement(query);
+			pst.setString(1,email);
+			rs = pst.executeQuery();
+			if(rs.next()){
+				return false;
+			}
+		}catch(Exception ex){
+			System.out.print("Error: " + ex);
+		}
+		return true;
+	}
 	public Boolean validUser(String email, String pass_word) throws Exception{
 		try{
 			//MySql select statement
