@@ -18,6 +18,8 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -73,6 +75,11 @@ public class BudgetManager extends Application {
 		while(!sql.validUser(user.getEmail(), user.getPass_word())){
 			//Create new user
 			if(!sql.available(user.getEmail())){
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Invalid User");
+				alert.setHeaderText("Username/password is invalid or already in use.");
+				alert.setContentText("Please enter a new username and/or password");
+				alert.showAndWait();
 				try {
 					emailPassword = loginDialog();
 				} catch (Exception e) {
