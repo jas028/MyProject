@@ -3,6 +3,7 @@ package budgetmanager;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 
 import budgetmanager.model.*;
@@ -40,6 +41,7 @@ public class BudgetManager extends Application {
 	
 	public static User user = new User();
 	private MySqlConnect sql;
+	private ArrayList<DebtLogSummary> debtSummary;
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 	private AnchorPane navigationLayout;
@@ -141,6 +143,26 @@ public class BudgetManager extends Application {
 		
 		//close connection to the database
 		sql.MySQLDisconnect();
+		
+		if(!debtData.isEmpty()){
+			//Array List of all the debt payments for every month
+			debtSummary = new ArrayList<DebtLogSummary>();
+			double usersTotalPool = 1195.0;
+			
+			//Check if the users total pool is enough to cover all minimum payments
+			if(!getDebtSummary(debtSummary, usersTotalPool)){
+				System.out.println("insifficient funds");
+			}
+			else
+				//print payoff log 
+				for(int j = 0; j < debtSummary.size(); j++){
+					System.out.println(debtSummary.get(j).getDebt().getName() + " will be paid off in " + debtSummary.get(j).getPayoffDate() + " months.");
+					for(DebtLog debtLog : debtSummary.get(j).getDebtLogSummary()){
+						System.out.println(debtLog.getMonth() + "  "+ debtLog.getPrinciple());
+					}
+				}
+		}
+		
 	}
 	
 	@Override
@@ -358,6 +380,62 @@ public class BudgetManager extends Application {
 			}
 			++i;
 		}
+	}
+	
+	public Boolean getDebtSummary(ArrayList <DebtLogSummary> debtSummary, double pool){
+		int offset = 0; //this is used to offset when we want to apply more payment for the next bill
+		int index = 0;//index for the next maximum rate
+		
+		//This loop puts all debts in the arraylist to a log
+		//the log hold the payment summary, debt information and payoff date
+		for(int i = 0; i < debtData.size(); i++){
+			DebtLogSummary dls = new DebtLogSummary();//new log
+			dls.setDebt(debtData.get(i));//insert the debt in the log
+			pool -= dls.getMinPayment();
+			debtSummary.add(dls);//add the debt log to array list of debt logs
+		}
+		
+		//If pool is less than accumulated min payments
+		if(pool < 0)
+			return false;
+	
+		//Do the summary for the upper bound (minimum payments)
+		for(int i = 0; i < debtSummary.size(); i++){			
+			debtSummary.get(i).worstCasePayoff();
+		}
+		
+		//Sort the the bill by projected payoff date
+		Collections.sort(debtSummary);
+	
+		//loop to get new payoffdate
+		for(int i = 0; i < debtSummary.size(); i++){
+			
+			//find max interest rate, this will go ahead and do the first calculation again
+			double max = 0;	
+			for(int j = 0; j < debtSummary.size(); j++)
+				if(max < debtSummary.get(j).getRate()){
+					max = debtSummary.get(j).getRate();
+					index = j;
+				}
+			
+			//Set the minimum payment to to the min + extra
+			debtSummary.get(index).setMinPayment(debtSummary.get(index).getMinPayment() + pool);
+			
+			//start the calculation at the offset date
+			debtSummary.get(index).payoffSooner(debtSummary.get(index), offset);
+		
+			//sort the list again by payoff date
+			Collections.sort(debtSummary);
+			
+			//index i is always the next projected bill to be paid off
+			//so accumulate the minimum payment to the pool
+			pool = debtSummary.get(i).getMinPayment();
+			//get the new offset from the ith bill
+			offset = debtSummary.get(i).getPayoffDate();
+			//set the iths bills rate to zero for the finding max technique
+			debtSummary.get(i).setRate(0);
+		}	
+		return true;
 	}
 	
 	/**
