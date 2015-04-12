@@ -174,6 +174,45 @@
                   </AnchorPane>
               </content>
             </Tab>
+            <Tab text="User Management">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <AnchorPane layoutX="233.0" layoutY="84.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <GridPane layoutY="6.0" prefHeight="156.0" prefWidth="394.0" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="236.0" minWidth="10.0" prefWidth="236.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="249.0" minWidth="10.0" prefWidth="203.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="247.0" text="Delete Account:" />
+                                    <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleDeleteUser" prefHeight="26.0" prefWidth="235.0" text="Delete" GridPane.columnIndex="1" />
+                                    <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="226.0" text="To Change Password" GridPane.rowIndex="2" />
+                                    <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="236.0" text="Enter Current Password:" GridPane.rowIndex="3" />
+                                    <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="247.0" text="Enter New Password:" GridPane.rowIndex="4" />
+                                    <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="331.0" text="Confirm New Password: " GridPane.rowIndex="5" />
+                                    <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleChangePassword" prefHeight="26.0" prefWidth="218.0" text="Change Password" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                    <PasswordField fx:id="currentPassword" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <PasswordField fx:id="newPassword" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                    <PasswordField fx:id="confirmNewPassword" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
       </tabs>
     </TabPane>
   </children>

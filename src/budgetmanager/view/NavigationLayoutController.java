@@ -1,13 +1,19 @@
 package budgetmanager.view;
 
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+
+import com.jcraft.jsch.JSchException;
 
 import budgetmanager.BudgetManager;
 import budgetmanager.model.Debt;
 import budgetmanager.model.Transaction;
+import budgetmanager.model.User;
+import budgetmanager.mysql.MySqlConnect;
 import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
@@ -24,6 +30,14 @@ public class NavigationLayoutController {
 	private TableColumn<Transaction, LocalDate> dateColumn;
 	@FXML
 	private TableColumn<Transaction, String> descriptionColumn;
+	
+	//--- Change Password Variables
+	@FXML
+	private TextField currentPassword;
+	@FXML
+	private TextField newPassword;
+	@FXML
+	private TextField confirmNewPassword;
 	
 	//--- Savings Calculator Variables
 	@FXML
@@ -287,6 +301,81 @@ public class NavigationLayoutController {
 		}
 	}
 	
+	public void handleChangePassword() throws JSchException{
+		User user = budgetManager.user;
+		try{
+			if(newPassword.getText().equals(confirmNewPassword.getText()) == false){
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Error in change password");
+				alert.setHeaderText("New passwords do not match");
+				alert.setContentText("New password fields do not match");
+				
+				alert.showAndWait();
+			}else{
+				MySqlConnect sql = new MySqlConnect();
+				if(sql.validUser(user.getEmail(), currentPassword.getText())){
+					Alert alert = new Alert(AlertType.CONFIRMATION);
+					alert.setTitle("Confirm Change Password");
+					alert.setHeaderText("Password will be changed");
+					alert.setContentText("Are you sure?");
+					
+					Optional <ButtonType> result = alert.showAndWait();
+					if(result.get() == ButtonType.OK){
+						sql.changePassword(user, newPassword.getText());
+					}
+				}else{
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setTitle("Incorrect Password");
+					alert.setHeaderText("Incorrect Password");
+					alert.setContentText("User Password Inavlid");
+					
+					alert.showAndWait();
+				}
+				
+				sql.MySQLDisconnect();
+			}
+			
+		}catch(Exception e){
+			System.out.println("Error in handleChangePassword: " + e);
+		}
+	}
+	/**
+	 * Called when user deletes their account
+	 * @throws Exception 
+	 * @throws SQLException 
+	 */
+	@FXML
+	public void handleDeleteUser() throws Exception{
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Confirm User Delete");
+		alert.setHeaderText("User account will be deleted");
+		alert.setContentText("Are you sure you want to delete this account?");
+		
+		Optional<ButtonType> result = alert.showAndWait();
+		
+		if(result.get() == ButtonType.OK){
+			MySqlConnect sql = new MySqlConnect();
+			User user = budgetManager.user;
+			
+			sql.deleteUser(user);
+			sql.MySQLDisconnect();
+			
+			alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("User Deleted");
+			alert.setHeaderText(null);
+			alert.setContentText("User has been deleted\n");
+			alert.showAndWait();
+			
+			System.exit(0);
+			sql.MySQLDisconnect();
+		}else{
+			alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("Deletion Cancelled");
+			alert.setHeaderText(null);
+			alert.setContentText("The account was not deleted");
+			alert.showAndWait();
+		}
+	}
 	/**
 	 * Called by the main application to give a reference of itself.
 	 * 

@@ -6,8 +6,8 @@ public class User {
 	private String pass_word;
 	
 	public User(){
-		email = "email@email.com";
-		pass_word = "password";
+		email = "";
+		pass_word = "";
 	}
 	public String getEmail() {
 		return email;

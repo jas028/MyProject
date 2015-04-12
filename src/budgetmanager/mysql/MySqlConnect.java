@@ -151,12 +151,12 @@ public class MySqlConnect {
 	public void insertDebt(User user, Debt debt) throws Exception{
 		try{
 			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS debts(email varchar(255), "
-					+ "name varchar(255), balance double, rate double, payment double, password varchar(255))");
+					+ "name varchar(255), balance double, rate double, payment double)");
 			//set MySql insert statement
 			pst.executeUpdate();
 			
-			String query = "INSERT INTO debts(email, name, balance, rate, payment, password)"
-					+ " VALUES(?, ?, ?, ?, ?, ?)";
+			String query = "INSERT INTO debts(email, name, balance, rate, payment)"
+					+ " VALUES(?, ?, ?, ?, ?)";
 			
 			//set insert variables
 			pst = con.prepareStatement(query);
@@ -165,7 +165,6 @@ public class MySqlConnect {
 			pst.setDouble (3, debt.getBalance());
 			pst.setDouble (4, debt.getRate());
 			pst.setDouble (5, debt.getPayment());
-			pst.setString (6, user.getPass_word());
 
 			//execute statement
 			pst.executeUpdate();
@@ -183,12 +182,12 @@ public class MySqlConnect {
 	public void insertIncome(User user, Transaction income) throws Exception{
 		try{
 			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS incomes(email varchar(255), "
-					+ "amount double, date date, description varchar(255), reoccuring boolean, password varchar(255))");
+					+ "amount double, date date, description varchar(255), reoccuring boolean)");
 			//create new table if it doesn't exist
 			pst.executeUpdate();
 			
-			String query = "INSERT INTO incomes(email, amount, date, description, reoccuring, password)"
-					+ "VALUES(?,?,?,?,?,?)";
+			String query = "INSERT INTO incomes(email, amount, date, description, reoccuring)"
+					+ "VALUES(?,?,?,?,?)";
 			
 			//set insert variables
 			pst = con.prepareStatement(query);
@@ -197,7 +196,6 @@ public class MySqlConnect {
 			pst.setDate   (3, Date.valueOf(income.getDate()));
 			pst.setString (4, income.getDescription());
 			pst.setBoolean(5, income.getReoccuring());
-			pst.setString (6, user.getPass_word());
 
 			//execute statement
 			pst.executeUpdate();
@@ -216,13 +214,13 @@ public class MySqlConnect {
 			pst = con.prepareStatement("CREATE TABLE IF NOT EXISTS "
 					+ "expenses(email varchar(255), "
 					+ "amount double, date date, description varchar(255), "
-					+ "reoccuring boolean, category varchar(255), password varchar(255))");
+					+ "reoccuring boolean, category varchar(255))");
 			pst.executeUpdate();
 			
 			//removed date
 			String query = "INSERT INTO expenses(email, amount, date, "
-					+ "description, reoccuring, category, password)"
-					+ "VALUES(?,?,?,?,?,?,?)";
+					+ "description, reoccuring, category)"
+					+ "VALUES(?,?,?,?,?,?)";
 			pst = con.prepareStatement(query);
 			pst.setString(1,user.getEmail());
 			pst.setDouble(2,expense.getValue());
@@ -230,7 +228,6 @@ public class MySqlConnect {
 			pst.setString(4, expense.getDescription());
 			pst.setBoolean(5, expense.getReoccuring());
 			pst.setString(6, expense.getCategory().toString());
-			pst.setString(7, user.getPass_word());
 			pst.execute();
 			
 		}catch(Exception ex){System.out.println("Error: " + ex);}
@@ -291,6 +288,22 @@ public class MySqlConnect {
 	 * @return
 	 * @throws Exception
 	 */
+	
+	public void changePassword(User user, String new_pass_word) throws Exception{
+		try{
+			String query = "DELETE FROM users WHERE email = ?";
+			pst = con.prepareStatement(query);
+			pst.setString(1, user.getEmail());
+			pst.executeUpdate();
+			
+			user.setPass_word(new_pass_word);
+			insertUser(user);
+			
+		}catch(Exception e){
+			System.out.println("Error in change password: " + e);
+		}
+	}
+	
 	public User selectUser(String email, String pass_word) throws Exception{
 		User user = new User();
 		try{
@@ -309,9 +322,7 @@ public class MySqlConnect {
 			//Loop to get all relevant data from table if it exists
 			//Returns user upon completion
 			while(rs.next() != false){
-				System.out.print(rs.getString("email") + " ");
 				user.setEmail(rs.getString("email"));
-				System.out.print(rs.getString("pass_word") + " ");
 				user.setPass_word(rs.getString("pass_word"));
 				return user;
 			}
@@ -335,9 +346,8 @@ public class MySqlConnect {
 		
 		//MySql request to select all Debts from User
 		try{
-			pst = con.prepareStatement("SELECT * FROM debts WHERE email = ? AND password = ?");
+			pst = con.prepareStatement("SELECT * FROM debts WHERE email = ?");
 			pst.setString(1, user.getEmail());
-			pst.setString(2, user.getPass_word());
 			rs = pst.executeQuery();
 			
 			//Loop through all the information pulled and insert fields into the object
@@ -372,9 +382,8 @@ public class MySqlConnect {
 		
 		//MySQL request to select all Expenses from User
 		try{
-			pst = con.prepareStatement("SELECT * FROM expenses WHERE email = ? and password = ?");
+			pst = con.prepareStatement("SELECT * FROM expenses WHERE email = ?");
 			pst.setString(1, user.getEmail());
-			pst.setString(2, user.getPass_word());
 			rs = pst.executeQuery();
 			
 			//Loop through all pulled information and add fields to objects
@@ -418,9 +427,8 @@ public class MySqlConnect {
 		
 		//MySQL request to select all Incomes from User
 		try{
-			pst = con.prepareStatement("SELECT * FROM incomes WHERE email = ? and password = ?");
+			pst = con.prepareStatement("SELECT * FROM incomes WHERE email = ?");
 			pst.setString(1, user.getEmail());
-			pst.setString(2, user.getPass_word());
 			rs = pst.executeQuery();
 			
 			//loop through all information pulled and add fields to object
@@ -456,31 +464,30 @@ public class MySqlConnect {
 			String query;
 			
 			//MySQL request to DELETE User from user table
-			query = "DELETE FROM users WHERE email = ? AND password = ?";
+			query = "DELETE FROM users WHERE email = ?";
 			pst = con.prepareStatement(query);
 			pst.setString(1, user.getEmail());
-			pst.setString(2, user.getPass_word());
 			pst.executeUpdate();
 			
 			//MySQL request to Delete User from expenses table
-			query = "DELETE FROM expenses WHERE email = ? And password = ?";
+			query = "DELETE FROM expenses WHERE email = ?";// And pass_word = ?";
 			pst = con.prepareStatement(query);
 			pst.setString(1, user.getEmail());
-			pst.setString(2, user.getPass_word());
+			//pst.setString(2, user.getPass_word());
 			pst.executeUpdate();
 			
 			//MySQL request to DELETE USER from incomes table
-			query = "DELETE FROM incomes WHERE email = ? And password = ?";
+			query = "DELETE FROM incomes WHERE email = ?";// And pass_word = ?";
 			pst = con.prepareStatement(query);
 			pst.setString(1, user.getEmail());
-			pst.setString(2, user.getPass_word());
+			//pst.setString(2, user.getPass_word());
 			pst.executeUpdate();
 			
 			//MySQL request to DELETE USER from incomes table
-			query = "DELETE FROM debts WHERE email = ? AND password = ?";
+			query = "DELETE FROM debts WHERE email = ?";// AND pass_word = ?";
 			pst = con.prepareStatement(query);
 			pst.setString(1, user.getEmail());
-			pst.setString(2, user.getPass_word());
+			//pst.setString(2, user.getPass_word());
 			pst.executeUpdate();
 			
 		}catch(Exception ex){System.out.println("Error: " + ex);}	

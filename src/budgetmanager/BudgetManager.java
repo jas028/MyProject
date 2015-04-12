@@ -38,7 +38,7 @@ import javafx.util.Pair;
  */
 public class BudgetManager extends Application {
 	
-	static User user = new User();
+	public static User user = new User();
 	private MySqlConnect sql;
 	private Stage primaryStage;
 	private BorderPane rootLayout;
@@ -75,12 +75,11 @@ public class BudgetManager extends Application {
 		while(!sql.validUser(user.getEmail(), user.getPass_word())){
 			//Create new user
 			if(!sql.available(user.getEmail())){
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Invalid User");
-				alert.setHeaderText("Username/password is invalid or already in use.");
-				alert.setContentText("Please enter a new username and/or password");
-				alert.showAndWait();
 				try {
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setTitle("Error");
+					alert.setHeaderText("Username invalid/unavailable");
+					alert.showAndWait();
 					emailPassword = loginDialog();
 				} catch (Exception e) {
 					Platform.exit();
