@@ -162,7 +162,6 @@ public class BudgetManager extends Application {
 					}
 				}
 		}
-		
 	}
 	
 	@Override

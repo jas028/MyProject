@@ -197,7 +197,7 @@ public class NavigationLayoutController {
 						setStyle("");
 					} else {
 						// Format value.
-						setText(rateFormatter.format(item)+"%");
+						setText(rateFormatter.format(item.doubleValue()*100)+"%");
 					}
 				}
 			};
@@ -480,6 +480,7 @@ public class NavigationLayoutController {
 		
 		try {
 			debtRate = Double.parseDouble(debtCalRate.getText());
+			debtRate = debtRate/100;
 			if(debtRate <= 0) {
 				throw new NumberFormatException();
 			}
