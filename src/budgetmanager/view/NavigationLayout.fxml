@@ -95,7 +95,7 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0">
                      <children>
-                        <GridPane layoutX="21.0" layoutY="18.0" prefHeight="78.0" prefWidth="545.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+                        <GridPane layoutX="21.0" layoutY="18.0" vgap="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
                           <columnConstraints>
                             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -107,6 +107,7 @@
                             <RowConstraints maxHeight="22.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
                             <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                               <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
                               <Label text="Loan Name:" GridPane.halignment="LEFT" />
@@ -117,12 +118,18 @@
                               <TextField fx:id="debtCalBalance" promptText="0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                               <TextField fx:id="debtCalPayment" promptText="0.00" GridPane.columnIndex="4" />
                               <TextField fx:id="debtCalRate" promptText="0.00" GridPane.columnIndex="4" GridPane.rowIndex="1" />
-                              <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleAddDebt" prefWidth="100.0" text="Add" GridPane.rowIndex="2" />
-                              <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleDebtPayoffCalc" prefWidth="125.0" text="Calculate Payoff" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                              <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleDeleteDebt" prefWidth="100.0" text="Delete" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleAddDebt" prefWidth="100.0" text="Add" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                              <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleDebtPayoffCalc" prefWidth="125.0" text="Calculate Payoff" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                              <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="4" GridPane.rowIndex="2">
+                                 <children>
+                                    <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleDeleteDebt" prefWidth="100.0" text="Delete" />
+                                 </children>
+                              </HBox>
+                              <Label text="Debt Payment Pool:" GridPane.rowIndex="3" />
+                              <TextField fx:id="debtPoolField" promptText="0.00" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                            </children>
                         </GridPane>
-                        <TableView fx:id="debtCalTable" layoutX="4.0" layoutY="104.0" prefHeight="156.0" prefWidth="587.0" AnchorPane.bottomAnchor="110.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <TableView fx:id="debtCalTable" layoutX="4.0" layoutY="104.0" prefHeight="156.0" prefWidth="587.0" AnchorPane.bottomAnchor="150.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                          	<columnResizePolicy>
                     			<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                   			</columnResizePolicy>

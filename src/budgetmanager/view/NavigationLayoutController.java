@@ -5,20 +5,29 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import com.jcraft.jsch.JSchException;
 
 import budgetmanager.BudgetManager;
 import budgetmanager.model.Debt;
+import budgetmanager.model.DebtLog;
+import budgetmanager.model.DebtLogSummary;
 import budgetmanager.model.Transaction;
 import budgetmanager.model.User;
 import budgetmanager.mysql.MySqlConnect;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class NavigationLayoutController {
 	
@@ -56,6 +65,8 @@ public class NavigationLayoutController {
 	private TextField debtCalPayment;
 	@FXML
 	private TextField debtCalRate;
+	@FXML
+	private TextField debtPoolField;
 	@FXML
 	private TableView<Debt> debtCalTable;
 	@FXML
@@ -520,13 +531,46 @@ public class NavigationLayoutController {
 	
 	@FXML
 	public void handleDebtPayoffCalc() {
-		// TODO: Debt calculations?
-		
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Information");
-		alert.setHeaderText("Debt Payoff Calculation");
-		alert.setContentText("This feature coming is coming soon");
-		
-		alert.showAndWait();
+		try {
+			Double pool = Double.parseDouble(debtPoolField.getText());
+
+			ArrayList<DebtLogSummary> debtLogSummaryList = new ArrayList<DebtLogSummary>();
+			
+			if(!budgetManager.getDebtSummary(debtLogSummaryList, pool)) {
+				throw new NumberFormatException();
+			}
+			
+			// Create line chart dialog
+			final NumberAxis xAxis = new NumberAxis();
+		    final NumberAxis yAxis = new NumberAxis();
+		    xAxis.setLabel("Months");
+		    yAxis.setLabel("Principle remaining");
+		    final LineChart<Number, Number> lineChart = new LineChart<Number, Number>(xAxis, yAxis);
+		    lineChart.setTitle("Principle/Month");
+		    
+		    Scene scene = new Scene(lineChart, 800, 600);
+		    
+		    for(DebtLogSummary debtLogSummary : debtLogSummaryList) {
+			    XYChart.Series<Number, Number> series = new XYChart.Series<Number, Number>();
+			    series.setName(debtLogSummary.getDebt().getName());
+			    for(DebtLog debtLog : debtLogSummary.getDebtLogSummary()) {
+			    	series.getData().add(new XYChart.Data<Number, Number>(debtLog.getMonth(), debtLog.getPrinciple()));
+			    }
+			    lineChart.getData().add(series);
+		    }
+
+		    Stage lineChartDialog = new Stage();
+		    lineChartDialog.initStyle(StageStyle.UTILITY);
+		    lineChartDialog.setScene(scene);
+		    lineChartDialog.show();
+			
+		} catch (NumberFormatException e) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Debt Calculate Error");
+			alert.setContentText("Debt payment pool values must be monetary values greater than or equal to the sum of all minimum payment values");
+			
+			alert.showAndWait();
+		}
 	}
 }

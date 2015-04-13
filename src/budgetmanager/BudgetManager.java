@@ -143,25 +143,6 @@ public class BudgetManager extends Application {
 		
 		//close connection to the database
 		sql.MySQLDisconnect();
-		
-		if(!debtData.isEmpty()){
-			//Array List of all the debt payments for every month
-			debtSummary = new ArrayList<DebtLogSummary>();
-			double usersTotalPool = 1195.0;
-			
-			//Check if the users total pool is enough to cover all minimum payments
-			if(!getDebtSummary(debtSummary, usersTotalPool)){
-				System.out.println("insifficient funds");
-			}
-			else
-				//print payoff log 
-				for(int j = 0; j < debtSummary.size(); j++){
-					System.out.println(debtSummary.get(j).getDebt().getName() + " will be paid off in " + debtSummary.get(j).getPayoffDate() + " months.");
-					for(DebtLog debtLog : debtSummary.get(j).getDebtLogSummary()){
-						System.out.println(debtLog.getMonth() + "  "+ debtLog.getPrinciple());
-					}
-				}
-		}
 	}
 	
 	@Override
