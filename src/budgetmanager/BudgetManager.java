@@ -143,6 +143,14 @@ public class BudgetManager extends Application {
 		
 		//close connection to the database
 		sql.MySQLDisconnect();
+		
+		debtSummary = new ArrayList<DebtLogSummary>();
+		if(avalanchMethod(debtSummary, 1320)){
+			for(int i = 0; i < debtSummary.size(); i++){
+				System.out.println(debtSummary.get(i).getDebt().getName());
+			}
+		}
+		
 	}
 	
 	@Override
@@ -414,6 +422,62 @@ public class BudgetManager extends Application {
 			offset = debtSummary.get(i).getPayoffDate();
 			//set the iths bills rate to zero for the finding max technique
 			debtSummary.get(i).setRate(0);
+		}	
+		return true;
+	}
+	
+	public Boolean avalanchMethod(ArrayList <DebtLogSummary> debtSummary, double pool){
+		int offset = 0; //this is used to offset when we want to apply more payment for the next bill
+		int index = 0;//index for the next maximum rate
+		
+		//This loop puts all debts in the arraylist to a log
+		//the log hold the payment summary, debt information and payoff date
+		for(int i = 0; i < debtData.size(); i++){
+			DebtLogSummary dls = new DebtLogSummary();//new log
+			dls.setDebt(debtData.get(i));//insert the debt in the log
+			pool -= dls.getMinPayment();
+			debtSummary.add(dls);//add the debt log to array list of debt logs
+		}
+		
+		//If pool is less than accumulated min payments
+		if(pool < 0)
+			return false;
+	
+		//Do the summary for the upper bound (minimum payments)
+		for(int i = 0; i < debtSummary.size(); i++){			
+			debtSummary.get(i).worstCasePayoff();
+		}
+		
+		//Sort the the bill by projected payoff date
+		Collections.sort(debtSummary);
+	
+		//loop to get new payoffdate
+		for(int i = 0; i < debtSummary.size(); i++){
+			
+			//find min balance, this will go ahead and do the first calculation again
+			double min = debtSummary.get(i).getBalance();	
+			for(int j = 0; j < debtSummary.size(); j++)
+				if(min > debtSummary.get(j).getBalance()){
+					min = debtSummary.get(j).getBalance();
+					index = j;
+				}
+			
+			//Set the minimum payment to to the min + extra
+			debtSummary.get(index).setMinPayment(debtSummary.get(index).getMinPayment() + pool);
+			
+			//start the calculation at the offset date
+			debtSummary.get(index).payoffSooner(debtSummary.get(index), offset);
+		
+			//sort the list again by payoff date
+			Collections.sort(debtSummary);
+			
+			//index i is always the next projected bill to be paid off
+			//so accumulate the minimum payment to the pool
+			pool = debtSummary.get(i).getMinPayment();
+			//get the new offset from the ith bill
+			offset = debtSummary.get(i).getPayoffDate();
+			//set the iths bills balance to zero for the finding max technique
+			debtSummary.get(i).setBalance(Integer.MAX_VALUE);
 		}	
 		return true;
 	}

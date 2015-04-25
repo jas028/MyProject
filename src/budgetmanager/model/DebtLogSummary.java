@@ -6,6 +6,7 @@ public class DebtLogSummary implements Comparable<DebtLogSummary>{
 	private ArrayList<DebtLog> debtLogSummary;
 	private Debt debt;
 	private int payoffDate;
+	private double balance;
 	private double rate;
 	private double minPayment;
 	
@@ -15,6 +16,7 @@ public class DebtLogSummary implements Comparable<DebtLogSummary>{
 		debt = null;
 		rate = 0;
 		minPayment = 0;
+		balance =0;
 	}
 	
 
@@ -32,14 +34,14 @@ public class DebtLogSummary implements Comparable<DebtLogSummary>{
 		
 		double interestPaid = 0;
 		double principlePaid = 0;
-		double balance = debt.getBalance();
+		double tempBalance = debt.getBalance();
 		int month = 0;
 		
 		
-		while(balance > 0){
+		while(tempBalance > 0 && month <= 600){
 			DebtLog debtLog = new DebtLog();
 			debtLog.setMonth(month);
-			interestPaid = (balance * rate) / 12;
+			interestPaid = (tempBalance * rate) / 12;
 			principlePaid = minPayment - interestPaid;
 			
 			if(month > 0)
@@ -52,13 +54,13 @@ public class DebtLogSummary implements Comparable<DebtLogSummary>{
 			
 			debtLog.setPrinciple(debtLog.getPrinciple() - principlePaid);
 			
-			if(balance < minPayment){
-				balance = 0;
+			if(tempBalance < minPayment){
+				tempBalance = 0;
 				debtLog.setPrinciple(0);
 			}
 			
 			else{
-				balance = debtLog.getPrinciple();
+				tempBalance = debtLog.getPrinciple();
 				month++;
 			}
 			debtLogSummary.add(debtLog);
@@ -69,18 +71,18 @@ public class DebtLogSummary implements Comparable<DebtLogSummary>{
 	
 	public void payoffSooner(DebtLogSummary dls, int offset){
 		
-		int month = offset;
+		int month = offset + 1;
 		
 		if(month < dls.getPayoffDate()){
 			
-			double balance = dls.getDebtLogSummary().get(month).getPrinciple();
+			double tempBalance = dls.getDebtLogSummary().get(month).getPrinciple();
 			double interestPaid = 0;
 			double principlePaid = 0;
 			
-			while(balance > 0){
+			while(tempBalance > 0 && month <= 600){
 				DebtLog debtLog = new DebtLog();
 				debtLog.setMonth(month);
-				interestPaid = (balance * rate) / 12;
+				interestPaid = (tempBalance * rate) / 12;
 				principlePaid = minPayment - interestPaid;
 			
 				if(month > 0)
@@ -93,14 +95,14 @@ public class DebtLogSummary implements Comparable<DebtLogSummary>{
 			
 				debtLog.setPrinciple(debtLog.getPrinciple() - principlePaid);
 			
-				if(balance < minPayment){
-					balance = 0;
+				if(tempBalance < minPayment){
+					tempBalance = 0;
 					debtLog.setPrinciple(0);
 					month++;
 				}
 			
 				else{
-					balance = debtLog.getPrinciple();
+					tempBalance = debtLog.getPrinciple();
 					month++;
 				}
 				debtLogSummary.set(month - 1, debtLog);
@@ -128,9 +130,9 @@ public class DebtLogSummary implements Comparable<DebtLogSummary>{
 		this.debt = debt;
 		rate = debt.getRate();
 		minPayment = debt.getPayment();
+		balance = debt.getBalance();
 	}
-	
-	
+		
 	public int getPayoffDate() {
 		return payoffDate;
 	}
@@ -153,5 +155,16 @@ public class DebtLogSummary implements Comparable<DebtLogSummary>{
 
 	public void setMinPayment(double minPayment) {
 		this.minPayment = minPayment;
-	}	
+	}
+
+
+	public double getBalance() {
+		return balance;
+	}
+
+
+	public void setBalance(double balance) {
+		this.balance = balance;
+	}
+	
 }
