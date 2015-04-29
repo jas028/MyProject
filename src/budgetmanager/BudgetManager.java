@@ -145,7 +145,7 @@ public class BudgetManager extends Application {
 		sql.MySQLDisconnect();
 		
 		debtSummary = new ArrayList<DebtLogSummary>();
-		if(avalanchMethod(debtSummary, 1320)){
+		if(snowballMethod(debtSummary, 1320)){
 			for(int i = 0; i < debtSummary.size(); i++){
 				System.out.println(debtSummary.get(i).getDebt().getName());
 			}
@@ -370,7 +370,7 @@ public class BudgetManager extends Application {
 		}
 	}
 	
-	public Boolean getDebtSummary(ArrayList <DebtLogSummary> debtSummary, double pool){
+	public Boolean avalancheMethod(ArrayList <DebtLogSummary> debtSummary, double pool){
 		int offset = 0; //this is used to offset when we want to apply more payment for the next bill
 		int index = 0;//index for the next maximum rate
 		
@@ -426,7 +426,7 @@ public class BudgetManager extends Application {
 		return true;
 	}
 	
-	public Boolean avalanchMethod(ArrayList <DebtLogSummary> debtSummary, double pool){
+	public Boolean snowballMethod(ArrayList <DebtLogSummary> debtSummary, double pool){
 		int offset = 0; //this is used to offset when we want to apply more payment for the next bill
 		int index = 0;//index for the next maximum rate
 		

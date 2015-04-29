@@ -119,14 +119,15 @@
                               <TextField fx:id="debtCalPayment" promptText="0.00" GridPane.columnIndex="4" />
                               <TextField fx:id="debtCalRate" promptText="0.00" GridPane.columnIndex="4" GridPane.rowIndex="1" />
                               <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleAddDebt" prefWidth="100.0" text="Add" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                              <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleDebtPayoffCalc" prefWidth="125.0" text="Calculate Payoff" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                               <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="4" GridPane.rowIndex="2">
                                  <children>
                                     <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleDeleteDebt" prefWidth="100.0" text="Delete" />
                                  </children>
                               </HBox>
-                              <Label text="Debt Payment Pool:" GridPane.rowIndex="3" />
+                              <Label text="Minimum Payment" GridPane.rowIndex="3" />
                               <TextField fx:id="debtPoolField" promptText="0.00" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <Button fx:id="snowballButton" alignment="CENTER" contentDisplay="CENTER" layoutX="447.0" layoutY="105.0" mnemonicParsing="false" onAction="#handleSnowballPayoffCalc" prefHeight="31.0" prefWidth="99.0" text="Snowball Calculation" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+                              <Button fx:id="avalancheButton" alignment="CENTER" contentDisplay="CENTER" layoutX="447.0" layoutY="105.0" mnemonicParsing="false" onAction="#handleAvalanchePayoffCalc" prefHeight="31.0" prefWidth="99.0" text="Avalanche Calculation" GridPane.columnIndex="3" GridPane.rowIndex="3" />
                            </children>
                         </GridPane>
                         <TableView fx:id="debtCalTable" layoutX="4.0" layoutY="104.0" prefHeight="156.0" prefWidth="587.0" AnchorPane.bottomAnchor="150.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

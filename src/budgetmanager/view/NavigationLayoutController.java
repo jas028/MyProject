@@ -530,13 +530,58 @@ public class NavigationLayoutController {
 	}
 	
 	@FXML
-	public void handleDebtPayoffCalc() {
+	public void handleAvalanchePayoffCalc() {
 		try {
 			Double pool = Double.parseDouble(debtPoolField.getText());
 
 			ArrayList<DebtLogSummary> debtLogSummaryList = new ArrayList<DebtLogSummary>();
+				
+			if(!budgetManager.avalancheMethod(debtLogSummaryList, pool)) {
+				throw new NumberFormatException();
+			}
 			
-			if(!budgetManager.getDebtSummary(debtLogSummaryList, pool)) {
+			// Create line chart dialog
+			final NumberAxis xAxis = new NumberAxis();
+		    final NumberAxis yAxis = new NumberAxis();
+		    xAxis.setLabel("Months");
+		    yAxis.setLabel("Principle remaining");
+		    final LineChart<Number, Number> lineChart = new LineChart<Number, Number>(xAxis, yAxis);
+		    lineChart.setTitle("Principle/Month");
+		    
+		    Scene scene = new Scene(lineChart, 800, 600);
+		    
+		    for(DebtLogSummary debtLogSummary : debtLogSummaryList) {
+			    XYChart.Series<Number, Number> series = new XYChart.Series<Number, Number>();
+			    series.setName(debtLogSummary.getDebt().getName());
+			    for(DebtLog debtLog : debtLogSummary.getDebtLogSummary()) {
+			    	series.getData().add(new XYChart.Data<Number, Number>(debtLog.getMonth(), debtLog.getPrinciple()));
+			    }
+			    lineChart.getData().add(series);
+		    }
+
+		    Stage lineChartDialog = new Stage();
+		    lineChartDialog.initStyle(StageStyle.UTILITY);
+		    lineChartDialog.setScene(scene);
+		    lineChartDialog.show();
+			
+		} catch (NumberFormatException e) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Debt Calculate Error");
+			alert.setContentText("Debt payment pool values must be monetary values greater than or equal to the sum of all minimum payment values");
+			
+			alert.showAndWait();
+		}
+	}
+	
+	@FXML
+	public void handleSnowballPayoffCalc() {
+		try {
+			Double pool = Double.parseDouble(debtPoolField.getText());
+
+			ArrayList<DebtLogSummary> debtLogSummaryList = new ArrayList<DebtLogSummary>();
+				
+			if(!budgetManager.snowballMethod(debtLogSummaryList, pool)) {
 				throw new NumberFormatException();
 			}
 			
